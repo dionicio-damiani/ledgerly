@@ -1,6 +1,6 @@
 <div align="center">
 
-# Smart Invoice Generator
+# Ledgerly
 
 **API-first FastAPI service that turns a JSON payload into a pixel-perfect invoice or quote PDF — plug in any frontend.**
 
@@ -26,7 +26,7 @@
 
 ## Why this project
 
-I built Smart Invoice Generator to solve the "ten lines of paid hours" problem freelancers
+I built Ledgerly to solve the "ten lines of paid hours" problem freelancers
 hit every month: generating clean, branded PDF invoices without paying for SaaS or wrestling
 with Word templates. The result is a small but seriously engineered service:
 
