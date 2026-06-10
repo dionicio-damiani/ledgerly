@@ -8,9 +8,13 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 
 ## Live Demo
 
-🔗 **[https://ledgerly.up.railway.app](https://ledgerly.up.railway.app)**
+**[→ Try it live](https://ledgerly.up.railway.app)**
 
-> 📸 [Try it live](https://ledgerly.up.railway.app)
+### Landing
+![Landing Demo](assets/landing-demo.gif)
+
+### App
+![App Demo](assets/app-demo.gif)
 
 ## Features
 
