@@ -11,9 +11,9 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 
 ## Live Demo
 
-🔗 **[https://ledgerly.fly.dev](https://ledgerly.fly.dev)** *(placeholder — deployment pending)*
+🔗 **[https://smart-invoice-generator-production.up.railway.app](https://smart-invoice-generator-production.up.railway.app)**
 
-> 📸 Screenshot coming soon.
+> 📸 [Try it live](https://smart-invoice-generator-production.up.railway.app)
 
 ## Features
 
