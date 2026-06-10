@@ -1,9 +1,6 @@
 # Ledgerly
 
-[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions)
-[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
-[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](#running-tests)
-[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions) ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white) ![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Overview
 
