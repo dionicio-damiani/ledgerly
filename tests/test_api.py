@@ -14,14 +14,14 @@ def test_health_endpoint(client):
 def test_landing_page_renders(client):
     res = client.get("/")
     assert res.status_code == 200
-    assert "Smart Invoice Generator" in res.text
+    assert "Ledgerly" in res.text
     assert "Generate Invoice" in res.text
 
 
 def test_app_renders_template(client):
     res = client.get("/app")
     assert res.status_code == 200
-    assert "Smart Invoice Generator" in res.text
+    assert "Ledgerly" in res.text
     assert "Document Settings" in res.text
 
 
