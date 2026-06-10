@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Invoice Generator</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── Topbar ─────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-mark">SI</div>
+      <div class="brand-text">
+        <span class="brand-name">Smart Invoice Generator</span>
+        <span class="brand-sub">Invoices &amp; quotes · PDF in seconds</span>
+      </div>
+    </div>
+    <div class="doc-status">
+      <span class="status-dot"></span>
+      <span id="doc-status-label">Draft</span>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ── Form column ──────────────────────── -->
+    <div class="form-column">
+
+      <!-- Document Settings -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Document Settings</h2>
+          <span class="card-index">01</span>
+        </div>
+
+        <div class="field">
+          <label>Document Type</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" data-type="Invoice" onclick="setDocType('Invoice')">Invoice</button>
+            <button class="toggle-btn" data-type="Quote" onclick="setDocType('Quote')">Quote</button>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="field">
+            <label for="doc_number"><span id="doc-type-label">Invoice #</span> <span class="required">*</span></label>
+            <input type="text" id="doc_number" placeholder="2026-001" />
+          </div>
+          <div class="field">
+            <label for="issue_date">Issue Date</label>
+            <input type="date" id="issue_date" />
+          </div>
+          <div class="field" id="due-date-row">
+            <label for="due_date">Due Date</label>
+            <input type="date" id="due_date" />
+          </div>
+        </div>
+
+        <div class="field field-narrow">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="MXN">MXN — Mexican Peso ($)</option>
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="ARS">ARS — Argentine Peso ($)</option>
+            <option value="COP">COP — Colombian Peso ($)</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Sender -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">From — Your Info</h2>
+          <span class="card-index">02</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="sender_name">Name / Company <span class="required">*</span></label>
+            <input type="text" id="sender_name" placeholder="Jane Doe / Acme Studio" />
+          </div>
+          <div class="field">
+            <label for="sender_email">Email</label>
+            <input type="email" id="sender_email" placeholder="jane@example.com" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="sender_logo">Company Logo (optional)</label>
+          <div class="logo-upload">
+            <input type="file" id="sender_logo" accept="image/png,image/jpeg,image/webp" />
+            <img id="sender-logo-preview" class="logo-preview" alt="Logo preview" style="display:none;" />
+          </div>
+          <span class="hint">PNG, JPG or WebP · Max 1MB · Appears top-left on the PDF</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="sender_phone">Phone</label>
+            <input type="tel" id="sender_phone" placeholder="+1 555 000 0000" />
+          </div>
+          <div class="field">
+            <label for="sender_address">Address</label>
+            <textarea id="sender_address" rows="2" placeholder="123 Main St&#10;New York, NY 10001"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Client -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Bill To — Client Info</h2>
+          <span class="card-index">03</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="client_name">Client Name <span class="required">*</span></label>
+            <input type="text" id="client_name" placeholder="John Smith" />
+          </div>
+          <div class="field">
+            <label for="client_company">Company (optional)</label>
+            <input type="text" id="client_company" placeholder="Client Corp LLC" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="client_email">Email</label>
+            <input type="email" id="client_email" placeholder="client@example.com" />
+          </div>
+          <div class="field">
+            <label for="client_address">Address</label>
+            <textarea id="client_address" rows="2" placeholder="456 Oak Ave&#10;Los Angeles, CA 90001"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Line Items -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Line Items</h2>
+          <span class="card-index">04</span>
+        </div>
+
+        <div class="items-header">
+          <span>Description</span>
+          <span>Qty</span>
+          <span class="col-right">Unit Price <span class="currency-badge" id="items-currency-badge">USD</span></span>
+          <span class="col-right">Total</span>
+          <span></span>
+        </div>
+
+        <div id="items-container"></div>
+
+        <button class="btn-add-item" onclick="addItem()">
+          <span class="add-icon">+</span> Add Line Item
+        </button>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Tax & Discount -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Tax &amp; Discount</h2>
+          <span class="card-index">05</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="tax_rate">Tax Rate (%)</label>
+            <input type="number" id="tax_rate" min="0" max="100" step="0.1" value="0" placeholder="e.g. 16" />
+            <span class="hint">Applied after discount. Set 0 to skip.</span>
+          </div>
+          <div class="field">
+            <label for="discount_percent">Discount (%)</label>
+            <input type="number" id="discount_percent" min="0" max="100" step="0.1" value="0" placeholder="e.g. 10" />
+            <span class="hint">Applied to subtotal before tax.</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Notes -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Notes</h2>
+          <span class="card-index">06</span>
+        </div>
+        <div class="field">
+          <textarea id="notes" rows="3" placeholder="Payment terms, bank details, thank you note, or any additional information for the client..."></textarea>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Signature -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Signature</h2>
+          <span class="card-index">07</span>
+        </div>
+        <div class="field">
+          <label for="signature_image">Upload Signature</label>
+          <input type="file" id="signature_image" accept="image/png,image/jpeg" />
+          <span class="hint">PNG or JPG · Max 1MB · Appears bottom-right on the PDF</span>
+          <img id="signature-image-preview" class="signature-preview" alt="Signature preview" style="display:none;" />
+        </div>
+        <div class="field">
+          <label for="signature_text">Or type your name as signature</label>
+          <input type="text" id="signature_text" maxlength="100" placeholder="Jane Doe" />
+          <span class="hint">Rendered in cursive on the PDF. Ignored if a signature image is uploaded.</span>
+        </div>
+      </section>
+
+    </div><!-- /.form-column -->
+
+    <!-- ── Summary column ───────────────────── -->
+    <aside class="summary-column">
+      <div class="summary-card">
+        <div class="summary-header">
+          <span class="summary-label">Document Total</span>
+          <span class="summary-doctype" id="summary-doctype">Invoice</span>
+        </div>
+
+        <div class="totals-preview">
+          <div class="row">
+            <span>Subtotal</span>
+            <span class="amount" id="t-subtotal">$0.00</span>
+          </div>
+          <div class="row" id="discount-row" style="display:none;">
+            <span id="t-discount-label">Discount</span>
+            <span class="amount" id="t-discount">- $0.00</span>
+          </div>
+          <div class="row" id="tax-row" style="display:none;">
+            <span id="t-tax-label">Tax</span>
+            <span class="amount" id="t-tax">$0.00</span>
+          </div>
+          <div class="row grand">
+            <span>Total Due <span id="t-currency" class="currency-tag">USD</span></span>
+            <span class="amount" id="t-grand">$0.00</span>
+          </div>
+        </div>
+
+        <button class="btn-generate" id="btn-generate" onclick="generatePDF()">
+          <div class="spinner"></div>
+          <span class="btn-label">Download Invoice PDF</span>
+        </button>
+      </div>
+    </aside>
+
+  </main>
+
+</div><!-- /.app-shell -->
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- PDF Preview Modal -->
+<div class="modal-overlay" id="pdf-modal-overlay" style="display:none;">
+  <div class="modal" id="pdf-modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="pdf-modal-title">Invoice Preview</h3>
+      <button class="modal-close" id="pdf-modal-close" aria-label="Close preview">&times;</button>
+    </div>
+    <iframe class="modal-iframe" id="pdf-preview-iframe" title="PDF preview"></iframe>
+    <div class="modal-footer">
+      <button class="btn-modal-secondary" id="pdf-modal-close-footer">Close</button>
+      <button class="btn-modal-primary" id="pdf-modal-download">Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Generate professional invoices and quotes as PDFs in seconds. No accounts, no subscriptions." />
+  <title>Smart Invoice Generator — Professional invoices, generated in seconds</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Landing nav ─────────────────────────── */
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.5rem 1.25rem;
+      background: #5b6af0;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ── Hero ────────────────────────────────── */
+    .hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 2rem;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          ellipse 80% 60% at 50% 40%,
+          rgba(91, 106, 240, 0.18) 0%,
+          rgba(91, 106, 240, 0.08) 40%,
+          transparent 70%
+        ),
+        #0d0d0d;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-content .brand-mark {
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      margin-bottom: 2.75rem;
+      max-width: 480px;
+      animation: fadeUp 0.6s ease 0.15s forwards;
+      opacity: 0;
+    }
+
+    /* ── CTA buttons ─────────────────────────── */
+    .btn-cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font);
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 15px 30px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.25);
+      transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-cta-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.35);
+    }
+
+    .hero-content .btn-cta-primary {
+      animation: fadeUp 0.6s ease 0.3s forwards;
+      opacity: 0;
+    }
+
+    /* ── Features ────────────────────────────── */
+    .features {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid #222222;
+      padding: 5.5rem 2rem;
+    }
+
+    .features-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .features-title {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 3.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px;
+      transition: border-color 0.15s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent);
+    }
+
+    .feature-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(var(--accent-rgb), 0.12);
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .feature-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+
+    /* ── Final CTA ───────────────────────────── */
+    .cta-final {
+      background: var(--bg);
+      padding: 6.5rem 2rem;
+      text-align: center;
+    }
+
+    .cta-final h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 2rem;
+    }
+
+    .cta-hint {
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ── Footer ──────────────────────────────── */
+    .landing-footer {
+      background: var(--bg-elevated);
+      border-top: 1px solid #222222;
+      padding: 1.75rem 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ── Responsive ──────────────────────────── */
+    @media (max-width: 768px) {
+      .hero { padding: 4.5rem 1.5rem; }
+      .hero h1 { font-size: 2.25rem; }
+      .features { padding: 3.5rem 1.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .cta-final { padding: 4.5rem 1.5rem; }
+      .cta-final h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Nav ──────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-mark">SI</div>
+      <div class="brand-text">
+        <span class="brand-name">Smart Invoice Generator</span>
+        <span class="brand-sub">Invoices &amp; quotes · PDF in seconds</span>
+      </div>
+    </div>
+    <a class="nav-cta" href="/app">Open App →</a>
+  </header>
+
+  <main>
+
+    <!-- ── Hero ─────────────────────────────── -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Professional invoices.<br />Generated in seconds.</h1>
+        <p class="hero-sub">Fill a form, get a PDF. No accounts, no subscriptions.</p>
+        <a class="btn-cta-primary" href="/app">Generate Invoice →</a>
+      </div>
+    </section>
+
+    <!-- ── Features ─────────────────────────── -->
+    <section class="features">
+      <div class="features-inner">
+        <h2 class="features-title">Everything you need, nothing you don't</h2>
+        <div class="features-grid">
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
+            </div>
+            <h3>Exact Decimal Precision</h3>
+            <p>Arithmetic handled with Python's Decimal — no float drift, no rounding errors.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+            </div>
+            <h3>Multi-currency &amp; Tax</h3>
+            <p>USD, EUR, MXN and more. Tax and discount applied in the right order, every time.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="12" y1="11" x2="12" y2="17" />
+                <polyline points="9 14 12 17 15 14" />
+              </svg>
+            </div>
+            <h3>Instant PDF Download</h3>
+            <p>Server-side PDF generation via ReportLab. Your file, your data, no storage.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Final CTA ────────────────────────── -->
+    <section class="cta-final">
+      <h2>Ready to send your first invoice?</h2>
+      <a class="btn-cta-primary" href="/app">Get Started →</a>
+      <p class="cta-hint">Free. No sign-up required.</p>
+    </section>
+
+  </main>
+
+</body>
+</html>
