@@ -11,9 +11,9 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 
 ## Live Demo
 
-🔗 **[https://smart-invoice-generator-production.up.railway.app](https://smart-invoice-generator-production.up.railway.app)**
+🔗 **[https://ledgerly.up.railway.app](https://ledgerly.up.railway.app)**
 
-> 📸 [Try it live](https://smart-invoice-generator-production.up.railway.app)
+> 📸 [Try it live](https://ledgerly.up.railway.app)
 
 ## Features
 
