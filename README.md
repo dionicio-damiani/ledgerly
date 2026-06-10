@@ -201,4 +201,4 @@ The suite covers HTTP routes, Pydantic validation rules, Decimal arithmetic (inc
 
 ## License
 
-[MIT](LICENSE)
+MIT — free to use, modify, and adapt for your own projects.
