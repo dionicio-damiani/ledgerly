@@ -1,130 +1,156 @@
-<div align="center">
-
 # Ledgerly
 
-**API-first FastAPI service that turns a JSON payload into a pixel-perfect invoice or quote PDF — plug in any frontend.**
-
-[![CI](https://github.com/YOUR_USERNAME/smart-invoice-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/smart-invoice-generator/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-89%25-brightgreen)](#tests)
+[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](#running-tests)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000)](https://github.com/astral-sh/ruff)
 
-[Live demo](https://smart-invoice-generator.fly.dev/) ·
-[API docs](https://smart-invoice-generator.fly.dev/docs) ·
-[Report bug](https://github.com/YOUR_USERNAME/smart-invoice-generator/issues)
+## Overview
 
-</div>
+Ledgerly turns a few details about a job — who it's for, what was done, how much it costs — into a polished, ready-to-send invoice or quote PDF in seconds. It's built for freelancers, agencies, and small businesses who need professional-looking billing documents without paying for bloated invoicing software or wrestling with spreadsheet templates. Add your logo, sign off with a typed name or an uploaded signature, preview the result instantly, and download a clean PDF — no account, no setup, no recurring fees.
 
----
+## Live Demo
 
-## Demo
+🔗 **[https://ledgerly.fly.dev](https://ledgerly.fly.dev)** *(placeholder — deployment pending)*
 
-> Screenshot/GIF coming soon. Try the [live demo](https://smart-invoice-generator.fly.dev/) or call the API directly —
-> `POST /generate` returns a PDF binary in ~200 ms. No signup, no API key.
-
-## Why this project
-
-I built Ledgerly to solve the "ten lines of paid hours" problem freelancers
-hit every month: generating clean, branded PDF invoices without paying for SaaS or wrestling
-with Word templates. The result is a small but seriously engineered service:
-
-- A single, typed JSON request returns a print-ready PDF.
-- Every monetary value is `Decimal`, not `float`. Drift-free, even on awkward tax rates.
-- The whole thing fits in a 256 MB Fly.io machine and starts cold in under a second.
-- 100% backed by tests; 89% line coverage; sub-second test suite.
+> 📸 Screenshot coming soon.
 
 ## Features
 
-- **One JSON in, one PDF out.** `POST /generate` returns `application/pdf` directly — no HTML intermediary.
-- **Framework-agnostic.** The included web UI is a demo; any client (React, HTMX, mobile app, cURL) integrates via a single POST request.
-- **Live totals preview.** `POST /api/preview` returns subtotal/tax/discount/grand-total without rendering a PDF.
-- **Strict validation.** Pydantic schemas enforce currency whitelist, max lengths, ISO dates, valid emails, and reject unknown fields.
-- **Decimal arithmetic.** Half-up rounding to two places, parametrized regression tests.
-- **Built-in rate limiting.** Sliding-window in-memory limiter with bounded keys.
-- **Clean OpenAPI docs.** Tagged operations, response models, and example payloads at `/docs`.
-- **Single-binary deploy.** Multi-stage Docker image with non-root user; ships to Fly.io with `fly deploy`.
+- **PDF generation in one request** — `POST /generate` returns a print-ready `application/pdf` invoice or quote, built server-side with ReportLab.
+- **In-browser PDF preview** — review the generated document in a modal before downloading, with download/close controls.
+- **Company branding** — upload a logo (PNG/JPEG/WebP, ≤1MB) that's embedded in the PDF header.
+- **Digital signature** — sign off with an uploaded signature image or a typed name rendered in italics.
+- **Exact decimal math** — every monetary calculation (subtotal, discount, tax, grand total) uses Python's `Decimal` with half-up rounding, never `float`.
+- **Multi-currency support** — USD, EUR, MXN, GBP, ARS, COP, with correct symbol formatting.
+- **Invoices & quotes** — toggle between document types; quotes show "TOTAL" instead of "TOTAL DUE" and skip the due date.
+- **Tax & discount handling** — percentage-based discount applied before tax, computed in the correct order.
+- **Strict input validation** — Pydantic v2 schemas enforce currency whitelists, field lengths, valid emails, ISO dates, and reject unknown fields outright.
+- **Live totals preview API** — `POST /api/preview` returns the computed breakdown as JSON without rendering a PDF.
+- **Built-in rate limiting** — sliding-window limiter protects `/generate` from abuse on a per-IP basis.
+- **Marketing landing page + standalone app UI** — a polished landing page at `/` and the invoice builder at `/app`.
+- **Framework-agnostic API** — the bundled UI is just one client; integrate from React, mobile, HTMX, or `curl`.
+- **Production-ready ops** — multi-stage Docker image, non-root user, health checks, GitHub Actions CI, and Fly.io deployment config.
 
-## Tech stack
+## Tech Stack
 
-| Layer | Tools |
-|-------|-------|
-| API | FastAPI · Pydantic v2 · Starlette |
-| PDF | ReportLab |
-| Demo UI | Vanilla HTML/CSS/JS — swappable; the API is frontend-agnostic |
-| Quality | pytest · pytest-cov · ruff · pre-commit |
-| Ops | Docker · GitHub Actions · Fly.io |
+| Layer | Technology |
+|-------|------------|
+| API framework | FastAPI |
+| Validation | Pydantic v2 |
+| PDF generation | ReportLab |
+| Templating | Jinja2 |
+| ASGI server | Uvicorn |
+| Frontend | Vanilla HTML, CSS, JavaScript |
+| Testing | pytest, pytest-cov, httpx |
+| Linting / formatting | ruff |
+| Containerization | Docker (multi-stage build) |
+| CI/CD | GitHub Actions |
+| Deployment | Fly.io |
 
-## Architecture
+## Project Structure
 
-```mermaid
-flowchart LR
-    UI[Demo UI<br/>swap for React · HTMX · mobile]
-    API[FastAPI app]
-    Models[Pydantic models<br/>Decimal types]
-    Totals[totals service<br/>compute_totals]
-    PDF[pdf.builder<br/>ReportLab]
-    Limiter[InMemoryRateLimiter]
-
-    UI -->|POST /generate| API
-    UI -->|POST /api/preview| API
-    API -->|validate| Models
-    API -->|enforce| Limiter
-    Models --> Totals
-    Models --> PDF
-    Totals --> API
-    PDF -->|bytes| API
-    API -->|application/pdf| UI
+```
+ledgerly/
+├── app/
+│   ├── main.py              # FastAPI app: routes, CORS, lifespan, OpenAPI metadata
+│   ├── config.py             # env-driven settings (currencies, limits, CORS, rate limit)
+│   ├── models.py              # Pydantic schemas — InvoiceRequest, LineItem, TotalsResponse
+│   ├── money.py                # Decimal helper for half-up rounding to 2 places
+│   ├── exceptions.py            # custom exceptions + global error handlers (RFC 7807-style)
+│   ├── rate_limit.py             # in-memory sliding-window rate limiter
+│   ├── pdf/
+│   │   ├── builder.py             # build_pdf() and per-section PDF flowable builders
+│   │   └── theme.py                 # cached colors and ReportLab paragraph styles
+│   └── services/
+│       └── totals.py                 # compute_totals() — Decimal arithmetic for the document
+├── templates/
+│   ├── landing.html                   # marketing landing page ("/")
+│   └── index.html                      # invoice/quote builder UI ("/app")
+├── static/
+│   ├── style.css                        # styling for landing + app
+│   └── script.js                         # form state, image uploads, PDF preview modal
+├── tests/                                 # pytest suite (models, API, PDF, totals, rate limit)
+├── examples/
+│   └── payload.json                        # sample request body for /generate and /api/preview
+├── main.py                                  # uvicorn entrypoint (re-exports app.main:app)
+├── Dockerfile                                # multi-stage build, non-root runtime user
+├── docker-compose.yml                         # local container run
+├── fly.toml                                    # Fly.io deployment config
+├── requirements.txt
+├── requirements-dev.txt
+└── pyproject.toml                               # pytest, coverage, and ruff configuration
 ```
 
-## Quickstart
+## Getting Started
 
-### Run with Docker (one command)
+### Prerequisites
+
+- Python 3.11, 3.12, or 3.13
+- pip
+- (Optional) Docker, if you'd rather run it in a container
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/dionicio-damiani/ledgerly.git
+cd ledgerly
+
+# 2. Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate          # Windows: .\venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run the dev server
+uvicorn main:app --reload
+```
+
+Open `http://localhost:8000/` for the landing page, `http://localhost:8000/app` for the invoice builder, or `http://localhost:8000/docs` for the interactive API docs.
+
+**Or with Docker:**
 
 ```bash
 docker compose up --build
 # → http://localhost:8000
 ```
 
-### Run with Python locally
+### Environment Variables
 
-```bash
-python -m venv venv
-source venv/bin/activate              # Windows: .\venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload
-# → http://localhost:8000
-```
+All configuration is optional — sensible defaults are baked into `app/config.py`. Set these via your shell, `docker-compose.yml`, or your deployment platform:
 
-Open `http://localhost:8000/` for the UI or `http://localhost:8000/docs` for the API explorer.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8000` | HTTP port the server listens on |
+| `LOG_LEVEL` | `INFO` | Python logging level |
+| `CORS_ORIGINS` | `*` | Comma-separated list of allowed CORS origins (set to your domain in production) |
+| `RATE_LIMIT_GENERATE` | `30/minute` | Per-IP rate limit on `POST /generate`, format `N/(second\|minute\|hour\|day)` |
 
-## API examples
+## API Reference
 
-### Generate a PDF
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Marketing landing page (HTML) |
+| `GET` | `/app` | Invoice/quote builder UI (HTML) |
+| `GET` | `/api/meta` | Returns supported currencies and document types |
+| `POST` | `/generate` | Validates the payload and returns the invoice/quote as a PDF binary |
+| `POST` | `/api/preview` | Returns computed totals (subtotal, discount, tax, grand total) as JSON, without rendering a PDF |
+| `GET` | `/health` | Liveness probe — returns app name, version, and status |
+
+Full interactive documentation (request/response schemas, examples) is available at `/docs` (Swagger UI) and `/redoc`.
+
+### Example: generate a PDF
 
 ```bash
 curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
-  -d '{
-    "doc_type": "Invoice",
-    "doc_number": "2026-001",
-    "issue_date": "2026-01-15",
-    "due_date": "2026-02-14",
-    "currency": "USD",
-    "sender_name": "Acme Studio",
-    "client_name": "John Smith",
-    "items": [
-      {"description": "Web design", "quantity": "1", "unit_price": "1500.00"},
-      {"description": "Hosting (12 mo)", "quantity": "12", "unit_price": "9.99"}
-    ],
-    "tax_rate": "16",
-    "discount_percent": "10"
-  }' \
+  -d @examples/payload.json \
   --output invoice.pdf
 ```
 
-### Preview totals (no PDF)
+### Example: preview totals only
 
 ```bash
 curl -X POST http://localhost:8000/api/preview \
@@ -145,128 +171,33 @@ curl -X POST http://localhost:8000/api/preview \
 }
 ```
 
-## Bring your own frontend
-
-The service is a pure REST API — the demo UI at `/` is optional. Any client that can send a POST request works:
-
-**JavaScript / React / Next.js**
-```js
-const res = await fetch("https://your-instance/generate", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-});
-const blob = await res.blob();
-const url = URL.createObjectURL(blob);
-window.open(url); // open PDF in new tab
-```
-
-**Python**
-```python
-import httpx
-response = httpx.post("https://your-instance/generate", json=payload)
-Path("invoice.pdf").write_bytes(response.content)
-```
-
-**HTMX** (zero JS, server-rendered flows)
-```html
-<button hx-post="/generate" hx-encoding="application/json"
-        hx-swap="none" onclick="downloadPdf(event)">
-  Download PDF
-</button>
-```
-
-Swap the demo UI for any of these without touching the backend.
-
-## Configuration
-
-All settings come from environment variables. Sensible defaults are baked in.
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `8000` | HTTP port |
-| `LOG_LEVEL` | `INFO` | Python logging level |
-| `CORS_ORIGINS` | `*` | Comma-separated origins. Set to your domain in production. |
-| `RATE_LIMIT_GENERATE` | `30/minute` | Per-IP cap on `/generate`. Format `N/(second|minute|hour|day)`. |
-
-## Tests
+## Running Tests
 
 ```bash
-make test            # quick run
-make test-cov        # with coverage report
+pytest --cov=app --cov-report=term-missing
 ```
 
-```text
-37 passed in 0.33s
-Coverage: 89% (threshold 80%)
-```
-
-The suite covers HTTP behaviour, Pydantic validation, Decimal arithmetic
-(including parametrized rounding cases), the rate limiter, and PDF byte output.
-
-## Deployment to Fly.io
+Or, using the provided `Makefile` targets:
 
 ```bash
-fly auth signup       # one-time
-fly launch --copy-config --no-deploy   # picks up fly.toml
-fly deploy
-fly open
+make test       # quick run
+make test-cov   # with terminal + HTML coverage report
 ```
 
-The included `fly.toml` provisions a 256 MB shared-CPU machine, scales to zero
-when idle, and forces HTTPS. Average cold start is ~1s.
+The suite covers HTTP routes, Pydantic validation rules, Decimal arithmetic (including rounding edge cases), the rate limiter, and PDF byte output — including the logo and signature flows.
 
-## Project layout
+## Architecture Decisions
 
-```
-app/
-├── config.py        # env-driven settings
-├── exceptions.py    # custom errors and global handlers
-├── main.py          # FastAPI routes, CORS, lifespan
-├── models.py        # Pydantic schemas (Decimal-typed)
-├── rate_limit.py    # sliding-window limiter
-├── pdf/
-│   ├── builder.py   # build_pdf + section helpers
-│   └── theme.py     # cached colors and paragraph styles
-└── services/
-    └── totals.py    # compute_totals (Decimal)
+- **`Decimal` everywhere money is involved.** All amounts (`Money`, `Quantity`, `Percent` types in `app/models.py`) are typed as `Decimal` and rounded with `ROUND_HALF_UP` via `app/money.py`. This avoids the classic `0.10 + 0.20 = 0.30000000000000004` float-drift problem — totals computed for the live preview and the final PDF always match exactly.
 
-tests/               # 37 tests across api/models/pdf/totals/rate_limit
-static/              # CSS + vanilla JS frontend
-templates/           # Jinja2 index page
-```
+- **Sliding-window rate limiting, not a fixed bucket.** `InMemoryRateLimiter` (`app/rate_limit.py`) tracks per-key timestamps in a `deque` and evicts entries outside the window on each hit. This avoids the "double burst at the window edge" problem of fixed-window counters, while staying dependency-free and bounded in memory (`max_keys` eviction).
 
-## Engineering decisions
+- **API-first, UI-optional design.** `/generate` and `/api/preview` are pure JSON-in/PDF-or-JSON-out endpoints with `extra="forbid"` schemas and OpenAPI examples. The bundled landing page and `/app` UI are just one client — any frontend (React, HTMX, mobile, a `curl` script) can integrate by sending a single POST request.
 
-- **`Decimal` everywhere money is involved.** A `float`-based subtotal of `0.10 + 0.20`
-  yields `0.30000000000000004`. The test suite explicitly guards against that drift.
-- **Sliding-window rate limiter, not fixed bucket.** Avoids burst-at-the-edge issues
-  where a client hits `30/min` twice in two seconds across a window boundary.
-- **Module-level paragraph styles via `@lru_cache`.** Building 16 ReportLab
-  `ParagraphStyle` objects per request was wasteful; now they're built once.
-- **`extra="forbid"` on every schema.** Defense in depth: clients sending unexpected
-  fields get an explicit 422 instead of silent acceptance.
+- **PDF assembly as composable section builders.** `app/pdf/builder.py` splits document construction into small, single-purpose functions (`_build_header`, `_build_billing_block`, `_build_items_table`, `_build_signature`, etc.) that each return ReportLab flowables. `build_pdf()` just assembles the story list — easy to extend (e.g. the logo and signature sections were added without touching existing builders) and easy to test in isolation.
 
-## Roadmap
-
-- [ ] Custom logo upload (sender header)
-- [ ] Multi-currency formatting per locale
-- [ ] PDF/A archival mode
-- [ ] Optional persistence for retrieving past documents
-- [ ] OAuth-protected variant for SaaS use cases
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). PRs welcome.
+- **Strict validation as defense in depth.** Every Pydantic model uses `extra="forbid"`, explicit `max_length` constraints, an `EmailStr` type for emails, a currency whitelist, and a cross-field validator ensuring `due_date >= issue_date`. Malformed or unexpected input is rejected with a structured 422 before it ever reaches business logic.
 
 ## License
 
 [MIT](LICENSE)
-
-## Author
-
-Built by **[YOUR NAME]** — available for freelance and contract work.
-
-- Portfolio: [your-site.com](https://your-site.com)
-- LinkedIn: [linkedin.com/in/your-handle](https://linkedin.com/in/your-handle)
-- Email: you@your-domain.com
