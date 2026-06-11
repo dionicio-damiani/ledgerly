@@ -63,9 +63,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: calc(100% + 48px);
-  margin-left: -24px;
-  margin-right: -24px;
+  width: 100%;
   margin-bottom: 28px;
   padding: 22px 2rem;
   box-sizing: border-box;
@@ -820,12 +818,7 @@ input[type="file"] {
 
 @media (max-width: 480px) {
   .app-shell { padding: 0 16px 48px; }
-  .topbar {
-    padding: 16px 1.25rem;
-    width: calc(100% + 32px);
-    margin-left: -16px;
-    margin-right: -16px;
-  }
+  .topbar { padding: 16px 1.25rem; }
   .brand-sub { display: none; }
   .doc-status span:not(.status-dot) { display: none; }
   .doc-status { padding: 8px; }
