@@ -1,13 +1,13 @@
 # Contributing
 
-Thanks for your interest in improving Smart Invoice Generator. This document
+Thanks for your interest in improving Ledgerly. This document
 explains the development workflow.
 
 ## Development setup
 
 ```bash
-git clone https://github.com/<your-user>/smart-invoice-generator.git
-cd smart-invoice-generator
+git clone https://github.com/<your-user>/ledgerly.git
+cd ledgerly
 make install        # creates venv and installs runtime deps
 make dev            # installs dev tools and pre-commit hooks
 make run            # starts uvicorn on :8000
