@@ -31,7 +31,7 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 - **Built-in rate limiting** — sliding-window limiter protects `/generate` from abuse on a per-IP basis.
 - **Marketing landing page + standalone app UI** — a polished landing page at `/` and the invoice builder at `/app`.
 - **Framework-agnostic API** — the bundled UI is just one client; integrate from React, mobile, HTMX, or `curl`.
-- **Production-ready ops** — multi-stage Docker image, non-root user, health checks, GitHub Actions CI, and Fly.io deployment config.
+- **Production-ready ops** — multi-stage Docker image, non-root user, health checks, GitHub Actions CI, and Railway deployment config.
 
 ## Tech Stack
 
@@ -47,7 +47,7 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 | Linting / formatting | ruff |
 | Containerization | Docker (multi-stage build) |
 | CI/CD | GitHub Actions |
-| Deployment | Fly.io |
+| Deployment | Railway |
 
 ## Project Structure
 
