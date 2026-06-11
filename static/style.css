@@ -154,6 +154,7 @@ body {
 .form-column {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 @media (max-width: 1024px) {
@@ -229,6 +230,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  min-width: 0;
 }
 
 .field-narrow {
@@ -258,6 +260,7 @@ input, select, textarea {
   transition: border-color 0.15s ease, background 0.15s ease;
   outline: none;
   width: 100%;
+  min-width: 0;
 }
 
 input:hover, select:hover, textarea:hover {
@@ -341,6 +344,7 @@ textarea {
   align-items: center;
   padding: 0 12px;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .col-right {
