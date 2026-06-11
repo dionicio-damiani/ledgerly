@@ -106,12 +106,12 @@ _EXAMPLE_PAYLOAD = {
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def landing(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse("landing.html", {"request": request})
+    return templates.TemplateResponse(request, "landing.html")
 
 
 @app.get("/app", response_class=HTMLResponse, include_in_schema=False)
 async def index(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 
 @app.post(
