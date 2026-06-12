@@ -17,6 +17,12 @@ let pdfFilename = '';
 let senderLogoDataUrl = null;
 let signatureImageDataUrl = null;
 
+// ── Edit mode (?id=XXX) ────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const editingInvoiceId = urlParams.get('id');
+const isEditMode = editingInvoiceId !== null;
+let preservedTheme = null;
+
 const MAX_IMAGE_BYTES = 1024 * 1024; // 1MB
 
 // Fallback symbols used until /api/meta resolves (or if it's unreachable).
@@ -34,6 +40,11 @@ function val(id) {
 function numVal(id, fallback = 0) {
   const v = parseFloat(val(id));
   return isNaN(v) ? fallback : v;
+}
+
+function setVal(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value ?? '';
 }
 
 function fmt(n, symbol) {
@@ -306,13 +317,22 @@ async function generatePDF() {
     signature_text: signatureImageDataUrl ? null : (val('signature_text') || null),
   };
 
+  // In edit mode, preserve the theme loaded from the existing invoice
+  // (there's no UI to edit it yet, so without this the PUT would wipe it out).
+  if (isEditMode && preservedTheme) {
+    payload.theme = preservedTheme;
+  }
+
+  const url = isEditMode ? `/invoices/${editingInvoiceId}` : '/generate';
+  const method = isEditMode ? 'PUT' : 'POST';
+
   const btn = document.getElementById('btn-generate');
   btn.disabled = true;
   btn.classList.add('loading');
 
   try {
-    const res = await fetch('/generate', {
-      method: 'POST',
+    const res = await fetch(url, {
+      method,
       headers: {
         'Content-Type': 'application/json',
         ...window.Auth.authHeader(),
@@ -337,14 +357,36 @@ async function generatePDF() {
       throw new Error(msg);
     }
 
-    // Build the blob URL and show it in the preview modal
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
     const filename = `${docType.toLowerCase()}-${payload.doc_number.replace(/[^\w-]/g, '-')}.pdf`;
 
-    openPdfModal(url, filename, docType);
+    if (isEditMode) {
+      // PUT only returns {"ok": true, ...} — fetch the regenerated PDF separately.
+      const pdfRes = await fetch(`/invoices/${editingInvoiceId}/pdf`, {
+        headers: { ...window.Auth.authHeader() },
+      });
 
-    showToast(`✓ ${docType} generated successfully!`, 'success');
+      if (pdfRes.status === 401) {
+        window.Auth.logout();
+        return;
+      }
+      if (!pdfRes.ok) {
+        throw new Error(`Server error ${pdfRes.status}`);
+      }
+
+      const blob = await pdfRes.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      openPdfModal(blobUrl, filename, docType);
+
+      showToast(`✓ ${docType} updated successfully!`, 'success');
+    } else {
+      // Build the blob URL and show it in the preview modal
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      openPdfModal(blobUrl, filename, docType);
+
+      showToast(`✓ ${docType} generated successfully!`, 'success');
+    }
+
     setStatus('generated');
   } catch (err) {
     showToast(`Error: ${err.message}`, 'error', 5000);
@@ -391,12 +433,126 @@ function downloadPdfFromModal() {
   showToast(`✓ ${docType} downloaded successfully!`, 'success');
 }
 
+// ── Edit mode: load existing invoice ──────────
+async function loadInvoiceForEdit() {
+  const formColumn = document.querySelector('.form-column');
+  let res;
+  try {
+    res = await fetch(`/invoices/${editingInvoiceId}`, {
+      headers: { ...window.Auth.authHeader() },
+    });
+  } catch {
+    showToast('Could not load this invoice.', 'error');
+    formColumn?.classList.remove('is-loading');
+    return;
+  }
+
+  if (res.status === 401) {
+    window.Auth.logout();
+    return;
+  }
+
+  if (res.status === 404) {
+    showToast("This invoice doesn't exist or doesn't belong to you.", 'error', 5000);
+    setTimeout(() => { window.location.href = '/my-invoices'; }, 2000);
+    return;
+  }
+
+  if (!res.ok) {
+    showToast('Could not load this invoice.', 'error');
+    formColumn?.classList.remove('is-loading');
+    return;
+  }
+
+  const data = await res.json();
+
+  // Document settings
+  setDocType(data.doc_type || 'Invoice');
+  setVal('doc_number', data.doc_number);
+  setVal('issue_date', data.issue_date);
+  setVal('due_date', data.due_date);
+  setVal('currency', data.currency);
+
+  // Sender
+  setVal('sender_name', data.sender_name);
+  setVal('sender_email', data.sender_email);
+  setVal('sender_phone', data.sender_phone);
+  setVal('sender_address', data.sender_address);
+
+  if (data.sender_logo) {
+    senderLogoDataUrl = data.sender_logo;
+    const logoPreview = document.getElementById('sender-logo-preview');
+    if (logoPreview) {
+      logoPreview.src = data.sender_logo;
+      logoPreview.style.display = '';
+    }
+  }
+
+  // Client
+  setVal('client_name', data.client_name);
+  setVal('client_email', data.client_email);
+  setVal('client_address', data.client_address);
+  setVal('client_company', data.client_company);
+
+  // Line items
+  items = data.items.map(i => ({
+    description: i.description,
+    quantity: Number(i.quantity),
+    unit_price: Number(i.unit_price),
+  }));
+  renderItems();
+
+  // Tax & discount
+  setVal('tax_rate', Number(data.tax_rate ?? 0));
+  setVal('discount_percent', Number(data.discount_percent ?? 0));
+
+  // Notes
+  setVal('notes', data.notes);
+
+  // Signature
+  if (data.signature_image) {
+    signatureImageDataUrl = data.signature_image;
+    const signaturePreview = document.getElementById('signature-image-preview');
+    if (signaturePreview) {
+      signaturePreview.src = data.signature_image;
+      signaturePreview.style.display = '';
+    }
+  }
+  setVal('signature_text', data.signature_text);
+
+  // Theme: no UI yet, just carry it through to the PUT payload
+  preservedTheme = data.theme || null;
+
+  // Update banner and totals, mark as "generated" since a PDF already exists
+  const bannerDocNum = document.getElementById('edit-mode-doc-number');
+  if (bannerDocNum) bannerDocNum.textContent = data.doc_number;
+
+  updateTotals();
+  setStatus('generated');
+
+  formColumn?.classList.remove('is-loading');
+}
+
 // ── Init ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   // Logout
   document.getElementById('logout-btn')?.addEventListener('click', () => {
     window.Auth.logout();
   });
+
+  // Edit mode: show banner with provisional id, disable the form while loading
+  if (isEditMode) {
+    const banner = document.getElementById('edit-mode-banner');
+    const bannerDocNum = document.getElementById('edit-mode-doc-number');
+    if (banner && bannerDocNum) {
+      bannerDocNum.textContent = `#${editingInvoiceId}`;
+      banner.hidden = false;
+    }
+    document.querySelector('.form-column')?.classList.add('is-loading');
+
+    const btnLabel = document.querySelector('#btn-generate .btn-label');
+    if (btnLabel) btnLabel.textContent = 'Update Invoice';
+  }
 
   // Load supported currencies from the API (falls back to the defaults above).
   try {
@@ -470,4 +626,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderItems();
   setDocType('Invoice');
+
+  // Edit mode: fetch and preload the existing invoice (overrides the defaults above)
+  if (isEditMode) {
+    await loadInvoiceForEdit();
+  }
 });
