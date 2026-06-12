@@ -69,24 +69,36 @@ ledgerly/
 │   ├── money.py                # Decimal helper for half-up rounding to 2 places
 │   ├── exceptions.py            # custom exceptions + global error handlers (RFC 7807-style)
 │   ├── rate_limit.py             # in-memory sliding-window rate limiter
+│   ├── auth/
+│   │   ├── manager.py              # FastAPI Users UserManager + JWT auth backend
+│   │   └── schemas.py                # UserRead / UserCreate pydantic schemas
+│   ├── db/
+│   │   ├── database.py             # async engine, session factory, Base, get_db
+│   │   └── models.py                 # SQLAlchemy models — User, Invoice
 │   ├── pdf/
 │   │   ├── builder.py             # build_pdf() and per-section PDF flowable builders
 │   │   └── theme.py                 # cached colors and ReportLab paragraph styles
 │   └── services/
 │       └── totals.py                 # compute_totals() — Decimal arithmetic for the document
+├── alembic/                                # database migrations
+│   ├── env.py                              # sync (psycopg2) migration runner
+│   └── versions/                            # migration scripts
 ├── templates/
 │   ├── landing.html                   # marketing landing page ("/")
 │   └── index.html                      # invoice/quote builder UI ("/app")
 ├── static/
 │   ├── style.css                        # styling for landing + app
 │   └── script.js                         # form state, image uploads, PDF preview modal
-├── tests/                                 # pytest suite (models, API, PDF, totals, rate limit)
+├── tests/                                 # pytest suite (models, API, PDF, totals, rate limit, auth)
 ├── examples/
 │   └── payload.json                        # sample request body for /generate and /api/preview
 ├── main.py                                  # uvicorn entrypoint (re-exports app.main:app)
+├── entrypoint.sh                             # runs `alembic upgrade head`, then starts uvicorn
 ├── Dockerfile                                # multi-stage build, non-root runtime user
 ├── docker-compose.yml                         # local container run
 ├── fly.toml                                    # Fly.io deployment config
+├── alembic.ini                                  # Alembic configuration
+├── .env.example                                  # template for local environment variables
 ├── requirements.txt
 ├── requirements-dev.txt
 └── pyproject.toml                               # pytest, coverage, and ruff configuration
@@ -114,7 +126,14 @@ source venv/bin/activate          # Windows: .\venv\Scripts\activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Run the dev server
+# 4. Start PostgreSQL (skip if you already have one running)
+docker run --name ledgerly-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=ledgerly -p 5432:5432 -d postgres:15
+
+# 5. Apply database migrations
+alembic upgrade head
+
+# 6. Run the dev server
 uvicorn main:app --reload
 ```
 
@@ -129,10 +148,12 @@ docker compose up --build
 
 ### Environment Variables
 
-All configuration is optional — sensible defaults are baked into `app/config.py`. Set these via your shell, `docker-compose.yml`, or your deployment platform:
+Copy `.env.example` to `.env` and adjust as needed. `PORT`, `LOG_LEVEL`, `CORS_ORIGINS`, and `RATE_LIMIT_GENERATE` have sensible defaults baked into `app/config.py`; `DATABASE_URL` and `SECRET_KEY` have insecure local-dev defaults that **must** be overridden in production:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5432/ledgerly` | Async PostgreSQL connection string (SQLAlchemy + asyncpg) |
+| `SECRET_KEY` | `your-secret-key-change-this-in-production` | Signing key for JWTs and password reset/verification tokens — set a strong, unique value in production |
 | `PORT` | `8000` | HTTP port the server listens on |
 | `LOG_LEVEL` | `INFO` | Python logging level |
 | `CORS_ORIGINS` | `*` | Comma-separated list of allowed CORS origins (set to your domain in production) |
@@ -228,7 +249,9 @@ make test       # quick run
 make test-cov   # with terminal + HTML coverage report
 ```
 
-The suite covers HTTP routes, Pydantic validation rules, Decimal arithmetic (including rounding edge cases), the rate limiter, and PDF byte output — including the logo and signature flows.
+The suite requires a running PostgreSQL instance reachable via `DATABASE_URL` (see [Getting Started](#getting-started)). Tests run against a separate `ledgerly_test` database, whose tables are created and dropped automatically for the test session.
+
+The suite covers HTTP routes, Pydantic validation rules, Decimal arithmetic (including rounding edge cases), the rate limiter, PDF byte output (including the logo and signature flows), and the JWT auth/registration flow.
 
 ## Architecture Decisions
 
