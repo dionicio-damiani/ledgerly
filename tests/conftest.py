@@ -86,13 +86,15 @@ async def async_client():
 
 @pytest.fixture(scope="session", autouse=True)
 async def create_test_database():
-    from app.db.database import engine, Base
+    from app.db.database import Base, engine
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    from passlib.context import CryptContext
+
     from app.db.database import async_session_maker
     from app.db.models import User
-    from passlib.context import CryptContext
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
