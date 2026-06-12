@@ -163,6 +163,11 @@ async def register_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "register.html")
 
 
+@app.get("/my-invoices", response_class=HTMLResponse, include_in_schema=False)
+async def my_invoices_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "invoices.html")
+
+
 @app.post(
     "/generate",
     tags=["documents"],
@@ -233,6 +238,9 @@ async def list_invoices(
             "id": inv.id,
             "doc_number": inv.invoice_data.get("doc_number"),
             "doc_type": inv.invoice_data.get("doc_type"),
+            "client_name": inv.invoice_data.get("client_name"),
+            "currency": inv.invoice_data.get("currency"),
+            "grand_total": str(compute_totals(InvoiceRequest(**inv.invoice_data)).grand_total),
             "created_at": inv.created_at.isoformat(),
         }
         for inv in invoices
@@ -252,6 +260,35 @@ async def get_invoice(
     if not invoice:
         raise HTTPException(404, "Invoice not found")
     return invoice.invoice_data
+
+
+@app.get("/invoices/{invoice_id}/pdf", tags=["invoices"])
+async def get_invoice_pdf(
+    invoice_id: int,
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+) -> StreamingResponse:
+    from sqlalchemy import select
+
+    result = await db.execute(select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id))
+    invoice = result.scalar_one_or_none()
+    if not invoice:
+        raise HTTPException(404, "Invoice not found")
+    if not invoice.pdf_bytes:
+        raise HTTPException(404, "PDF_NOT_AVAILABLE")
+
+    slug = re.sub(r"[^\w-]", "-", invoice.invoice_data.get("doc_number") or str(invoice_id))
+    filename = f"{slug}.pdf"
+
+    return StreamingResponse(
+        io.BytesIO(invoice.pdf_bytes),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(invoice.pdf_bytes)),
+            "Cache-Control": "no-store",
+        },
+    )
 
 
 @app.put("/invoices/{invoice_id}", tags=["invoices"])

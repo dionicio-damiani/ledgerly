@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ledgerly — Mis facturas</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-mark">L</div>
+    <div class="brand-text">
+      <span class="brand-name">Ledgerly</span>
+      <span class="brand-sub">Invoices &amp; quotes · PDF in seconds</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button type="button" id="logout-btn" class="btn-logout">Log out</button>
+  </div>
+</header>
+
+<div class="app-shell">
+  <main class="invoices-page">
+    <div class="invoices-header">
+      <h1 class="invoices-title">Mis facturas</h1>
+      <a href="/app" class="btn-new-invoice">Nueva factura</a>
+    </div>
+
+    <p id="invoices-loading" class="invoices-state">Cargando...</p>
+
+    <div id="invoices-error" class="invoices-state" style="display:none;">
+      <p>No pudimos cargar tus facturas.</p>
+      <button type="button" id="invoices-retry" class="btn-new-invoice">Reintentar</button>
+    </div>
+
+    <div id="invoices-empty" class="invoices-state" style="display:none;">
+      <p>Todavía no creaste ninguna factura.</p>
+      <a href="/app" class="btn-new-invoice">Crear la primera</a>
+    </div>
+
+    <table id="invoices-table" class="invoices-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="invoices-tbody"></tbody>
+    </table>
+  </main>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script src="/static/auth.js"></script>
+<script src="/static/invoices.js"></script>
+</body>
+</html>

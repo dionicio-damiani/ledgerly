@@ -892,6 +892,8 @@ a.topbar-brand {
 }
 
 .btn-logout {
+  display: inline-flex;
+  align-items: center;
   padding: 7px 14px;
   background: transparent;
   border: 1px solid var(--border);
@@ -900,6 +902,7 @@ a.topbar-brand {
   font-family: var(--font);
   font-size: 0.78rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
@@ -907,4 +910,140 @@ a.topbar-brand {
 .btn-logout:hover {
   border-color: var(--error);
   color: var(--error);
+}
+
+/* === My Invoices page === */
+.invoices-page {
+  padding-top: 32px;
+}
+
+.invoices-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.invoices-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.btn-new-invoice {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-new-invoice:hover {
+  background: var(--accent-hover);
+}
+
+.invoices-state {
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-mid);
+}
+
+.invoices-state p {
+  margin: 0 0 18px;
+}
+
+.invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.invoices-table th,
+.invoices-table td {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.invoices-table th {
+  color: var(--text-label);
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+}
+
+.invoices-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.invoices-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.invoices-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.invoices-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-row-action {
+  padding: 6px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.btn-row-action:hover {
+  background: var(--surface-3);
+}
+
+.btn-row-danger:hover {
+  background: var(--error-bg);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+@media (max-width: 640px) {
+  .invoices-table thead {
+    display: none;
+  }
+
+  .invoices-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 18px;
+    gap: 6px;
+  }
+
+  .invoices-table td {
+    padding: 0;
+  }
+
+  .invoices-actions {
+    margin-top: 8px;
+  }
 }

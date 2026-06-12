@@ -45,6 +45,68 @@ async def test_update_invoice_success(async_client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_list_invoices_includes_client_currency_and_total(async_client: AsyncClient):
+    token = await _register_and_login(async_client, "list-fields@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    await async_client.post("/generate", json=PAYLOAD, headers=headers)
+
+    list_response = await async_client.get("/invoices", headers=headers)
+    assert list_response.status_code == 200
+    entry = list_response.json()[0]
+
+    assert entry["doc_number"] == PAYLOAD["doc_number"]
+    assert entry["client_name"] == PAYLOAD["client_name"]
+    assert entry["currency"] == PAYLOAD["currency"]
+    assert entry["grand_total"] == "100.00"
+
+
+@pytest.mark.asyncio
+async def test_get_invoice_pdf_success(async_client: AsyncClient):
+    token = await _register_and_login(async_client, "pdf-success@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    await async_client.post("/generate", json=PAYLOAD, headers=headers)
+    list_response = await async_client.get("/invoices", headers=headers)
+    invoice_id = list_response.json()[0]["id"]
+
+    response = await async_client.get(f"/invoices/{invoice_id}/pdf", headers=headers)
+    assert response.status_code == 200
+    assert response.content.startswith(b"%PDF-")
+
+
+@pytest.mark.asyncio
+async def test_get_invoice_pdf_not_found(async_client: AsyncClient):
+    token = await _register_and_login(async_client, "pdf-notfound@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = await async_client.get("/invoices/999999/pdf", headers=headers)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_invoice_pdf_requires_auth(async_client: AsyncClient):
+    response = await async_client.get("/invoices/1/pdf")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_invoice_pdf_unauthorized(async_client: AsyncClient):
+    token_owner = await _register_and_login(async_client, "pdf-owner@example.com")
+    token_intruder = await _register_and_login(async_client, "pdf-intruder@example.com")
+
+    headers_owner = {"Authorization": f"Bearer {token_owner}"}
+    headers_intruder = {"Authorization": f"Bearer {token_intruder}"}
+
+    await async_client.post("/generate", json=PAYLOAD, headers=headers_owner)
+    list_response = await async_client.get("/invoices", headers=headers_owner)
+    invoice_id = list_response.json()[0]["id"]
+
+    response = await async_client.get(f"/invoices/{invoice_id}/pdf", headers=headers_intruder)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_update_invoice_not_found(async_client: AsyncClient):
     token = await _register_and_login(async_client, "update-notfound@example.com")
     headers = {"Authorization": f"Bearer {token}"}
