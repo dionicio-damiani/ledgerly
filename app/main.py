@@ -7,6 +7,7 @@ import logging
 import os
 import re
 from contextlib import asynccontextmanager
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -241,6 +242,28 @@ async def get_invoice(
     if not invoice:
         raise HTTPException(404, "Invoice not found")
     return invoice.invoice_data
+
+
+@app.put("/invoices/{invoice_id}", tags=["invoices"])
+async def update_invoice(
+    invoice_id: int,
+    payload: Annotated[InvoiceRequest, Body(..., examples=[_EXAMPLE_PAYLOAD])],
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select
+
+    result = await db.execute(select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id))
+    invoice = result.scalar_one_or_none()
+    if not invoice:
+        raise HTTPException(404, "Invoice not found")
+
+    invoice.invoice_data = payload.model_dump(mode="json")
+    invoice.pdf_bytes = build_pdf(payload)
+    invoice.updated_at = datetime.utcnow()
+    await db.commit()
+
+    return {"ok": True, "message": "Invoice updated"}
 
 
 @app.delete("/invoices/{invoice_id}", tags=["invoices"])
