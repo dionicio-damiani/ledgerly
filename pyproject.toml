@@ -10,6 +10,8 @@ addopts = "-ra --strict-markers"
 filterwarnings = [
   "ignore::DeprecationWarning",
 ]
+asyncio_default_fixture_loop_scope = "session"
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["app"]

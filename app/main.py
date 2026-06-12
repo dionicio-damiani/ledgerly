@@ -4,17 +4,23 @@ from __future__ import annotations
 
 import io
 import logging
+import os
 import re
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import Body, Depends, FastAPI, Request
+from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi_users import FastAPIUsers
+from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.manager import get_user_manager
+from app.auth.schemas import UserCreate, UserRead
 from app.config import (
     APP_NAME,
     APP_VERSION,
@@ -24,6 +30,8 @@ from app.config import (
     LOG_LEVEL,
     RATE_LIMIT_GENERATE,
 )
+from app.db.database import get_db
+from app.db.models import Invoice, User
 from app.exceptions import register_exception_handlers
 from app.models import HealthResponse, InvoiceRequest, TotalsResponse
 from app.pdf.builder import build_pdf
@@ -84,6 +92,36 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 
+# ==================== AUTHENTICATION ====================
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
+
+bearer_transport = BearerTransport(tokenUrl="auth/login")
+
+
+def get_jwt_strategy() -> JWTStrategy:
+    return JWTStrategy(secret=SECRET_KEY, lifetime_seconds=3600)
+
+
+auth_backend = AuthenticationBackend(
+    name="jwt",
+    transport=bearer_transport,
+    get_strategy=get_jwt_strategy,
+)
+
+
+fastapi_users = FastAPIUsers[User, int](
+    get_user_manager,
+    [auth_backend],
+)
+
+current_user = fastapi_users.current_user(active=True)
+
+# Auth routers
+app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth", tags=["auth"])
+app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["auth"])
+# ========================================================
+
+
 _EXAMPLE_PAYLOAD = {
     "doc_type": "Invoice",
     "doc_number": "2026-001",
@@ -131,9 +169,20 @@ async def index(request: Request) -> HTMLResponse:
 )
 async def generate(
     payload: Annotated[InvoiceRequest, Body(..., examples=[_EXAMPLE_PAYLOAD])],
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     """Render the invoice/quote PDF and stream it back as `application/pdf`."""
     pdf_bytes = build_pdf(payload)
+
+    # Guardar en base de datos
+    invoice = Invoice(
+        user_id=user.id,
+        invoice_data=payload.model_dump(mode="json"),
+        pdf_bytes=pdf_bytes,
+    )
+    db.add(invoice)
+    await db.commit()
 
     slug = re.sub(r"[^\w-]", "-", payload.doc_number)
     filename = f"{payload.doc_type.lower()}-{slug}.pdf"
@@ -155,6 +204,61 @@ async def generate(
             "Cache-Control": "no-store",
         },
     )
+
+
+@app.get("/invoices", tags=["invoices"])
+async def list_invoices(
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select
+    result = await db.execute(
+        select(Invoice).where(Invoice.user_id == user.id).order_by(Invoice.created_at.desc())
+    )
+    invoices = result.scalars().all()
+    return [
+        {
+            "id": inv.id,
+            "doc_number": inv.invoice_data.get("doc_number"),
+            "doc_type": inv.invoice_data.get("doc_type"),
+            "created_at": inv.created_at.isoformat(),
+        }
+        for inv in invoices
+    ]
+
+
+@app.get("/invoices/{invoice_id}", tags=["invoices"])
+async def get_invoice(
+    invoice_id: int,
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select
+    result = await db.execute(
+        select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id)
+    )
+    invoice = result.scalar_one_or_none()
+    if not invoice:
+        raise HTTPException(404, "Invoice not found")
+    return invoice.invoice_data
+
+
+@app.delete("/invoices/{invoice_id}", tags=["invoices"])
+async def delete_invoice(
+    invoice_id: int,
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select
+    result = await db.execute(
+        select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id)
+    )
+    invoice = result.scalar_one_or_none()
+    if not invoice:
+        raise HTTPException(404, "Invoice not found")
+    await db.delete(invoice)
+    await db.commit()
+    return {"ok": True, "message": "Invoice deleted"}
 
 
 @app.post(
