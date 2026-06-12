@@ -2,6 +2,13 @@
    Smart Invoice Generator — script.js
 ═══════════════════════════════════════════════ */
 
+// Auth guard: si no hay token, redirigir a /login
+if (!window.Auth || !window.Auth.isAuthenticated()) {
+  window.location.href = '/login';
+  // Detener ejecución del resto del script
+  throw new Error('Not authenticated');
+}
+
 // ── State ────────────────────────────────────
 let docType = 'Invoice';
 let items = [{ description: '', quantity: 1, unit_price: 0 }];
@@ -306,9 +313,17 @@ async function generatePDF() {
   try {
     const res = await fetch('/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...window.Auth.authHeader(),
+      },
       body: JSON.stringify(payload),
     });
+
+    if (res.status === 401) {
+      window.Auth.logout();
+      return;
+    }
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -378,6 +393,11 @@ function downloadPdfFromModal() {
 
 // ── Init ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // Logout
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    window.Auth.logout();
+  });
+
   // Load supported currencies from the API (falls back to the defaults above).
   try {
     const meta = await fetch('/api/meta').then(res => res.json());
