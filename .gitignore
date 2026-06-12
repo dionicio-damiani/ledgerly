@@ -46,3 +46,4 @@ Thumbs.db
 
 # Fly.io
 .fly/
+pytest_output.txt
