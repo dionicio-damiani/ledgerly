@@ -1,6 +1,6 @@
 # Ledgerly
 
-[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions) ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white) ![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?logo=pydantic&logoColor=white) ![ReportLab](https://img.shields.io/badge/ReportLab-PDF-CC0000) ![pytest](https://img.shields.io/badge/pytest-tested-0A9EDC?logo=pytest&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white) ![Railway](https://img.shields.io/badge/Railway-deployed-0B0D0E?logo=railway&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black) ![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue)
+[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions) ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white) ![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?logo=pydantic&logoColor=white) ![ReportLab](https://img.shields.io/badge/ReportLab-PDF-CC0000) ![pytest](https://img.shields.io/badge/pytest-tested-0A9EDC?logo=pytest&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white) ![Railway](https://img.shields.io/badge/Railway-deployed-0B0D0E?logo=railway&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black) ![Coverage](https://img.shields.io/badge/coverage-88%25-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Overview
 
@@ -8,7 +8,7 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 
 ## Live Demo
 
-**[→ Try it live](https://ledgerly.up.railway.app)**
+**[→ Try it live](https://ledgerly.up.railway.app)** · **[API docs (Swagger UI)](https://ledgerly.up.railway.app/docs)**
 
 ### Landing
 ![Landing Demo](assets/landing-demo.gif)
@@ -37,7 +37,7 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 - **User-specific invoice storage** — every generated invoice is persisted and scoped to the authenticated user.
 - **CRUD endpoints for saved invoices** (`/invoices`, `/invoices/{id}`) — list, retrieve, update, and delete previously generated invoices.
 - **Dynamic PDF theming** — pass custom `primary_color`, `secondary_color`, and `text_color` (hex) in the payload to recolor the generated PDF.
-- **Test suite with 48 passing tests** — covering auth, API, PDF generation, and rate limiting.
+- **Test suite with 52 passing tests** — covering auth, API, PDF generation, theming, CRUD, and rate limiting.
 
 ## Tech Stack
 
@@ -236,6 +236,7 @@ Ledgerly uses [FastAPI Users](https://fastapi-users.github.io/fastapi-users/) wi
 | `POST` | `/auth/login` | Exchange credentials for a JWT access token |
 | `GET` | `/invoices` | List all invoices saved by the authenticated user |
 | `GET` | `/invoices/{id}` | Retrieve a saved invoice by ID |
+| `PUT` | `/invoices/{id}` | Update a saved invoice (regenerates the stored PDF) |
 | `DELETE` | `/invoices/{id}` | Delete a saved invoice by ID |
 
 `POST /generate` requires authentication and saves a copy of the generated invoice to the database. `POST /api/preview` remains public and does not require a token.
