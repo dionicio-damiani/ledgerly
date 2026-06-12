@@ -35,10 +35,13 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = os.getenv(
-        "DATABASE_URL", "postgresql+psycopg2://postgres:postgres@localhost:5432/ledgerly"
+    original_database_url = os.getenv(
+        "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/ledgerly"
     )
+    sync_database_url = original_database_url.replace("+asyncpg", "+psycopg2")
+
+    configuration = config.get_section(config.config_ini_section)
+    configuration["sqlalchemy.url"] = sync_database_url
 
     connectable = engine_from_config(
         configuration,
