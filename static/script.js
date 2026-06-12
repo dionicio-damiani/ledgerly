@@ -21,7 +21,13 @@ let signatureImageDataUrl = null;
 const urlParams = new URLSearchParams(window.location.search);
 const editingInvoiceId = urlParams.get('id');
 const isEditMode = editingInvoiceId !== null;
-let preservedTheme = null;
+
+// ── Theme (PDF color palette) ──────────────────
+const THEME_DEFAULTS = {
+  primary_color: '#0F4C81',
+  secondary_color: '#EBF2FA',
+  text_color: '#1A1A2E',
+};
 
 const MAX_IMAGE_BYTES = 1024 * 1024; // 1MB
 
@@ -45,6 +51,22 @@ function numVal(id, fallback = 0) {
 function setVal(id, value) {
   const el = document.getElementById(id);
   if (el) el.value = value ?? '';
+}
+
+// ── Theme helpers ──────────────────────────────
+function getCurrentTheme() {
+  return {
+    primary_color: document.getElementById('theme-primary').value,
+    secondary_color: document.getElementById('theme-secondary').value,
+    text_color: document.getElementById('theme-text').value,
+  };
+}
+
+function setTheme(theme) {
+  const t = theme || THEME_DEFAULTS;
+  document.getElementById('theme-primary').value = t.primary_color || THEME_DEFAULTS.primary_color;
+  document.getElementById('theme-secondary').value = t.secondary_color || THEME_DEFAULTS.secondary_color;
+  document.getElementById('theme-text').value = t.text_color || THEME_DEFAULTS.text_color;
 }
 
 function fmt(n, symbol) {
@@ -315,13 +337,9 @@ async function generatePDF() {
 
     signature_image: signatureImageDataUrl,
     signature_text: signatureImageDataUrl ? null : (val('signature_text') || null),
-  };
 
-  // In edit mode, preserve the theme loaded from the existing invoice
-  // (there's no UI to edit it yet, so without this the PUT would wipe it out).
-  if (isEditMode && preservedTheme) {
-    payload.theme = preservedTheme;
-  }
+    theme: getCurrentTheme(),
+  };
 
   const url = isEditMode ? `/invoices/${editingInvoiceId}` : '/generate';
   const method = isEditMode ? 'PUT' : 'POST';
@@ -526,8 +544,8 @@ async function loadInvoiceForEdit() {
   }
   setVal('signature_text', data.signature_text);
 
-  // Theme: no UI yet, just carry it through to the PUT payload
-  preservedTheme = data.theme || null;
+  // Theme: preload the color pickers with the saved palette (or defaults)
+  setTheme(data.theme);
 
   // Update banner and totals, mark as "generated" since a PDF already exists
   const bannerDocNum = document.getElementById('edit-mode-doc-number');
@@ -597,6 +615,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Any edit after a successful generation reverts the status badge to "Draft"
   document.addEventListener('input', () => setStatus('draft'));
   document.addEventListener('change', () => setStatus('draft'));
+
+  // Theme color pickers
+  document.getElementById('theme-reset')?.addEventListener('click', () => {
+    setTheme(THEME_DEFAULTS);
+  });
 
   // Logo / signature uploads
   const logoInput = document.getElementById('sender_logo');
