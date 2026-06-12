@@ -32,6 +32,11 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 - **Marketing landing page + standalone app UI** — a polished landing page at `/` and the invoice builder at `/app`.
 - **Framework-agnostic API** — the bundled UI is just one client; integrate from React, mobile, HTMX, or `curl`.
 - **Production-ready ops** — multi-stage Docker image, non-root user, health checks, GitHub Actions CI, and Railway deployment config.
+- **Multi-user authentication with JWT** — register and log in via `fastapi-users`, then authenticate requests with a bearer token.
+- **PostgreSQL database with SQLAlchemy** — async SQLAlchemy 2.0 models, with schema migrations managed by Alembic.
+- **User-specific invoice storage** — every generated invoice is persisted and scoped to the authenticated user.
+- **CRUD endpoints for saved invoices** (`/invoices`, `/invoices/{id}`) — list, retrieve, and delete previously generated invoices.
+- **Test suite with 48 passing tests** — covering auth, API, PDF generation, and rate limiting.
 
 ## Tech Stack
 
@@ -43,11 +48,15 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 | Templating | Jinja2 |
 | ASGI server | Uvicorn |
 | Frontend | Vanilla HTML, CSS, JavaScript |
-| Testing | pytest, pytest-cov, httpx |
+| Testing | pytest, pytest-cov, pytest-asyncio, httpx |
 | Linting / formatting | ruff |
 | Containerization | Docker (multi-stage build) |
 | CI/CD | GitHub Actions |
 | Deployment | Railway |
+| Database | PostgreSQL |
+| ORM | SQLAlchemy |
+| Migrations | Alembic |
+| Authentication | FastAPI Users, JWT |
 
 ## Project Structure
 
@@ -170,6 +179,40 @@ curl -X POST http://localhost:8000/api/preview \
   "tax_amount": "233.26",
   "grand_total": "1691.15"
 }
+```
+
+## Authentication
+
+Ledgerly uses [FastAPI Users](https://fastapi-users.github.io/fastapi-users/) with a JWT bearer backend for multi-user access. Each user's generated invoices are stored in PostgreSQL and scoped to their account.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/auth/register` | Create a new user account (email + password) |
+| `POST` | `/auth/login` | Exchange credentials for a JWT access token |
+| `GET` | `/invoices` | List all invoices saved by the authenticated user |
+| `GET` | `/invoices/{id}` | Retrieve a saved invoice by ID |
+| `DELETE` | `/invoices/{id}` | Delete a saved invoice by ID |
+
+`POST /generate` requires authentication and saves a copy of the generated invoice to the database. `POST /api/preview` remains public and does not require a token.
+
+### Example: register and authenticate
+
+```bash
+# Register
+curl -X POST http://localhost:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "strongpassword"}'
+
+# Login
+curl -X POST http://localhost:8000/auth/login \
+  -d "username=user@example.com&password=strongpassword"
+
+# Generate (authenticated)
+curl -X POST http://localhost:8000/generate \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d @examples/payload.json \
+  --output invoice.pdf
 ```
 
 ## Running Tests
