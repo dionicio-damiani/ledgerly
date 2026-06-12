@@ -468,6 +468,12 @@ async function loadInvoiceForEdit() {
 
   // Document settings
   setDocType(data.doc_type || 'Invoice');
+
+  // setDocType() resets the submit button label to "Download X PDF" as a
+  // side effect, so it must be overridden after the last call to it.
+  const btnLabel = document.querySelector('#btn-generate .btn-label');
+  if (btnLabel) btnLabel.textContent = 'Update Invoice';
+
   setVal('doc_number', data.doc_number);
   setVal('issue_date', data.issue_date);
   setVal('due_date', data.due_date);
@@ -549,9 +555,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       banner.hidden = false;
     }
     document.querySelector('.form-column')?.classList.add('is-loading');
-
-    const btnLabel = document.querySelector('#btn-generate .btn-label');
-    if (btnLabel) btnLabel.textContent = 'Update Invoice';
   }
 
   // Load supported currencies from the API (falls back to the defaults above).
