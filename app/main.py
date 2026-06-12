@@ -153,6 +153,16 @@ async def index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "index.html")
 
 
+@app.get("/login", response_class=HTMLResponse, include_in_schema=False)
+async def login_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "login.html")
+
+
+@app.get("/register", response_class=HTMLResponse, include_in_schema=False)
+async def register_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "register.html")
+
+
 @app.post(
     "/generate",
     tags=["documents"],
