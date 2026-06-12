@@ -35,7 +35,8 @@ Ledgerly turns a few details about a job — who it's for, what was done, how mu
 - **Multi-user authentication with JWT** — register and log in via `fastapi-users`, then authenticate requests with a bearer token.
 - **PostgreSQL database with SQLAlchemy** — async SQLAlchemy 2.0 models, with schema migrations managed by Alembic.
 - **User-specific invoice storage** — every generated invoice is persisted and scoped to the authenticated user.
-- **CRUD endpoints for saved invoices** (`/invoices`, `/invoices/{id}`) — list, retrieve, and delete previously generated invoices.
+- **CRUD endpoints for saved invoices** (`/invoices`, `/invoices/{id}`) — list, retrieve, update, and delete previously generated invoices.
+- **Dynamic PDF theming** — pass custom `primary_color`, `secondary_color`, and `text_color` (hex) in the payload to recolor the generated PDF.
 - **Test suite with 48 passing tests** — covering auth, API, PDF generation, and rate limiting.
 
 ## Tech Stack
@@ -179,6 +180,29 @@ curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
   -d @examples/payload.json \
   --output invoice.pdf
+```
+
+### Example: custom PDF theme
+
+Pass an optional `theme` object to recolor the generated PDF. Each field is an optional `#RRGGBB` hex color; any field left out falls back to the default palette.
+
+```json
+{
+  "theme": {
+    "primary_color": "#2C5F2D",
+    "secondary_color": "#97BC62",
+    "text_color": "#1A1A2E"
+  },
+  "doc_type": "Invoice",
+  "doc_number": "INV-1001",
+  "issue_date": "2026-01-15",
+  "currency": "USD",
+  "sender_name": "Acme Studio",
+  "client_name": "John Smith",
+  "items": [
+    {"description": "Web design", "quantity": "1", "unit_price": "1200.00"}
+  ]
+}
 ```
 
 ### Example: preview totals only
