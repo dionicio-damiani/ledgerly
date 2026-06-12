@@ -1,38 +1,82 @@
-"""PDF visual theme: colors and paragraph styles, instantiated once."""
+"""PDF visual theme: colors and paragraph styles, instantiated once per palette."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import lru_cache
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
-ACCENT: Final = colors.HexColor("#0F4C81")
-ACCENT_LIGHT: Final = colors.HexColor("#EBF2FA")
-TEXT_DARK: Final = colors.HexColor("#1A1A2E")
+if TYPE_CHECKING:
+    from app.models import InvoiceRequest
+
+DEFAULT_PRIMARY_COLOR: Final = "#0F4C81"
+DEFAULT_SECONDARY_COLOR: Final = "#EBF2FA"
+DEFAULT_TEXT_COLOR: Final = "#1A1A2E"
+
 TEXT_MID: Final = colors.HexColor("#4A4A6A")
 TEXT_LIGHT: Final = colors.HexColor("#8A8AAA")
 BORDER: Final = colors.HexColor("#D0D8E8")
 WHITE: Final = colors.white
 
 
-@lru_cache(maxsize=1)
-def _styles() -> dict[str, ParagraphStyle]:
-    """Build the full stylesheet exactly once and cache it."""
+@dataclass(frozen=True)
+class Theme:
+    """Resolved PDF color palette for a single document."""
+
+    primary_hex: str = DEFAULT_PRIMARY_COLOR
+    secondary_hex: str = DEFAULT_SECONDARY_COLOR
+    text_hex: str = DEFAULT_TEXT_COLOR
+
+    @property
+    def primary(self) -> colors.Color:
+        return colors.HexColor(self.primary_hex)
+
+    @property
+    def secondary(self) -> colors.Color:
+        return colors.HexColor(self.secondary_hex)
+
+    @property
+    def text(self) -> colors.Color:
+        return colors.HexColor(self.text_hex)
+
+
+DEFAULT_THEME: Final = Theme()
+
+
+def get_theme(request: InvoiceRequest) -> Theme:
+    """Resolve the document's color palette from the request, falling back to defaults."""
+    custom = request.theme
+    if custom is None:
+        return DEFAULT_THEME
+
+    return Theme(
+        primary_hex=custom.primary_color or DEFAULT_PRIMARY_COLOR,
+        secondary_hex=custom.secondary_color or DEFAULT_SECONDARY_COLOR,
+        text_hex=custom.text_color or DEFAULT_TEXT_COLOR,
+    )
+
+
+@lru_cache(maxsize=32)
+def _styles(theme: Theme) -> dict[str, ParagraphStyle]:
+    """Build the full stylesheet for a given color palette and cache it."""
     base = getSampleStyleSheet()
+    accent = theme.primary
+    text_dark = theme.text
 
     def s(name: str, **kwargs) -> ParagraphStyle:
         return ParagraphStyle(name, parent=base["Normal"], **kwargs)
 
     return {
-        "doc_type": s("DocType", fontSize=28, textColor=ACCENT, fontName="Helvetica-Bold", leading=32),
+        "doc_type": s("DocType", fontSize=28, textColor=accent, fontName="Helvetica-Bold", leading=32),
         "doc_number": s("DocNumber", fontSize=10, textColor=TEXT_MID, fontName="Helvetica", leading=14),
         "sender_name": s(
             "SenderName",
             fontSize=13,
-            textColor=TEXT_DARK,
+            textColor=text_dark,
             fontName="Helvetica-Bold",
             leading=16,
             alignment=TA_RIGHT,
@@ -48,16 +92,16 @@ def _styles() -> dict[str, ParagraphStyle]:
         "label": s(
             "Label", fontSize=7.5, textColor=TEXT_LIGHT, fontName="Helvetica-Bold", leading=10, spaceBefore=4
         ),
-        "value": s("Value", fontSize=9.5, textColor=TEXT_DARK, fontName="Helvetica", leading=13),
+        "value": s("Value", fontSize=9.5, textColor=text_dark, fontName="Helvetica", leading=13),
         "value_bold": s(
-            "ValueBold", fontSize=9.5, textColor=TEXT_DARK, fontName="Helvetica-Bold", leading=13
+            "ValueBold", fontSize=9.5, textColor=text_dark, fontName="Helvetica-Bold", leading=13
         ),
         "table_header": s("TableHeader", fontSize=8, textColor=WHITE, fontName="Helvetica-Bold", leading=10),
-        "table_cell": s("TableCell", fontSize=9, textColor=TEXT_DARK, fontName="Helvetica", leading=12),
+        "table_cell": s("TableCell", fontSize=9, textColor=text_dark, fontName="Helvetica", leading=12),
         "table_cell_right": s(
             "TableCellRight",
             fontSize=9,
-            textColor=TEXT_DARK,
+            textColor=text_dark,
             fontName="Helvetica",
             leading=12,
             alignment=TA_RIGHT,
@@ -73,7 +117,7 @@ def _styles() -> dict[str, ParagraphStyle]:
         "totals_value": s(
             "TotalsValue",
             fontSize=9,
-            textColor=TEXT_DARK,
+            textColor=text_dark,
             fontName="Helvetica-Bold",
             leading=12,
             alignment=TA_RIGHT,
@@ -109,7 +153,7 @@ def _styles() -> dict[str, ParagraphStyle]:
         "signature_text": s(
             "SignatureText",
             fontSize=11,
-            textColor=TEXT_DARK,
+            textColor=text_dark,
             fontName="Helvetica-Oblique",
             leading=14,
             alignment=TA_RIGHT,
@@ -117,6 +161,6 @@ def _styles() -> dict[str, ParagraphStyle]:
     }
 
 
-def style(name: str) -> ParagraphStyle:
-    """Lookup a cached paragraph style by short name."""
-    return _styles()[name]
+def style(name: str, theme: Theme = DEFAULT_THEME) -> ParagraphStyle:
+    """Lookup a cached paragraph style by short name for the given color palette."""
+    return _styles(theme)[name]

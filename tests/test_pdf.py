@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from app.models import ThemeColors
 from app.pdf.builder import build_pdf
 
 EXAMPLE_PAYLOAD_PATH = Path(__file__).resolve().parent.parent / "examples" / "payload.json"
@@ -37,6 +38,17 @@ def test_build_pdf_no_tax_no_discount(sample_request):
     sample_request.discount_percent = Decimal("0")
     data = build_pdf(sample_request)
     assert data.startswith(b"%PDF-")
+
+
+def test_generate_pdf_with_custom_colors(sample_request):
+    sample_request.theme = ThemeColors(
+        primary_color="#FF5733",
+        secondary_color="#FFF5E1",
+        text_color="#222222",
+    )
+    data = build_pdf(sample_request)
+    assert data.startswith(b"%PDF-")
+    assert len(data) > 1000
 
 
 def test_generate_with_all_optional_fields(client):

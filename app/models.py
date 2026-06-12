@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from decimal import Decimal
 from typing import Annotated
@@ -24,6 +25,8 @@ Money = Annotated[Decimal, Field(max_digits=14, decimal_places=2, ge=Decimal("0"
 Quantity = Annotated[Decimal, Field(max_digits=12, decimal_places=4, gt=Decimal("0"))]
 Percent = Annotated[Decimal, Field(max_digits=5, decimal_places=2, ge=Decimal("0"), le=Decimal("100"))]
 
+HEX_COLOR_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
+
 
 class LineItem(BaseModel):
     """A single billable line on an invoice or quote."""
@@ -37,6 +40,23 @@ class LineItem(BaseModel):
     @property
     def total(self) -> Decimal:
         return money(self.quantity * self.unit_price)
+
+
+class ThemeColors(BaseModel):
+    """Optional custom color palette for the generated PDF."""
+
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    primary_color: str | None = Field(default=None)
+    secondary_color: str | None = Field(default=None)
+    text_color: str | None = Field(default=None)
+
+    @field_validator("primary_color", "secondary_color", "text_color")
+    @classmethod
+    def _validate_hex_color(cls, v: str | None) -> str | None:
+        if v is not None and not HEX_COLOR_PATTERN.match(v):
+            raise ValueError("must be a hex color in the format #RRGGBB")
+        return v
 
 
 class InvoiceRequest(BaseModel):
@@ -70,6 +90,8 @@ class InvoiceRequest(BaseModel):
 
     signature_image: str | None = Field(default=None)
     signature_text: str | None = Field(default=None, max_length=100)
+
+    theme: ThemeColors | None = Field(default=None)
 
     @field_validator("sender_logo", "signature_image")
     @classmethod
