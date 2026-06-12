@@ -1,4 +1,5 @@
 """Pydantic schemas for authentication."""
+
 from fastapi_users import schemas
 
 

@@ -212,6 +212,7 @@ async def list_invoices(
     db: AsyncSession = Depends(get_db),
 ):
     from sqlalchemy import select
+
     result = await db.execute(
         select(Invoice).where(Invoice.user_id == user.id).order_by(Invoice.created_at.desc())
     )
@@ -234,9 +235,8 @@ async def get_invoice(
     db: AsyncSession = Depends(get_db),
 ):
     from sqlalchemy import select
-    result = await db.execute(
-        select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id)
-    )
+
+    result = await db.execute(select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id))
     invoice = result.scalar_one_or_none()
     if not invoice:
         raise HTTPException(404, "Invoice not found")
@@ -250,9 +250,8 @@ async def delete_invoice(
     db: AsyncSession = Depends(get_db),
 ):
     from sqlalchemy import select
-    result = await db.execute(
-        select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id)
-    )
+
+    result = await db.execute(select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user.id))
     invoice = result.scalar_one_or_none()
     if not invoice:
         raise HTTPException(404, "Invoice not found")

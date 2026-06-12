@@ -1,8 +1,9 @@
 """Database configuration and session management."""
+
 from __future__ import annotations
 
 import os
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
@@ -27,4 +28,5 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def get_user_db(session: AsyncSession = Depends(get_db)):
     from app.db.models import User
+
     yield SQLAlchemyUserDatabase(session, User)

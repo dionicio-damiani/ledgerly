@@ -1,4 +1,4 @@
 from app.db.database import Base, get_db
-from app.db.models import User, Invoice
+from app.db.models import Invoice, User
 
-__all__ = ["Base", "get_db", "User", "Invoice"]
+__all__ = ["Base", "Invoice", "User", "get_db"]
