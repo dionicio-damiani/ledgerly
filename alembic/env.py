@@ -11,7 +11,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Importar los modelos y Base
 from app.db.database import Base
-from app.db.models import User, Invoice
+
+# Imported for their side effect of registering the User/Invoice tables on
+# Base.metadata, which target_metadata below relies on for autogenerate.
+from app.db.models import Invoice, User  # noqa: F401
 
 config = context.config
 

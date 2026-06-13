@@ -121,11 +121,21 @@ function setDocType(type) {
     type === 'Invoice' ? 'Invoice #' : 'Quote #';
   document.getElementById('due-date-row').style.display =
     type === 'Invoice' ? '' : 'none';
-  document.getElementById('btn-generate').querySelector('.btn-label').textContent =
-    `Download ${type} PDF`;
 
   const summaryDocType = document.getElementById('summary-doctype');
   if (summaryDocType) summaryDocType.textContent = type;
+
+  updateSubmitButtonLabel();
+}
+
+function updateSubmitButtonLabel() {
+  const btnLabel = document.querySelector('#btn-generate .btn-label');
+  if (!btnLabel) return;
+  if (isEditMode) {
+    btnLabel.textContent = 'Update Invoice';
+  } else {
+    btnLabel.textContent = `Download ${docType} PDF`;
+  }
 }
 
 // ── Items ─────────────────────────────────────
@@ -486,11 +496,6 @@ async function loadInvoiceForEdit() {
 
   // Document settings
   setDocType(data.doc_type || 'Invoice');
-
-  // setDocType() resets the submit button label to "Download X PDF" as a
-  // side effect, so it must be overridden after the last call to it.
-  const btnLabel = document.querySelector('#btn-generate .btn-label');
-  if (btnLabel) btnLabel.textContent = 'Update Invoice';
 
   setVal('doc_number', data.doc_number);
   setVal('issue_date', data.issue_date);
