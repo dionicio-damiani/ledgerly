@@ -44,6 +44,4 @@ Thumbs.db
 # Logs
 *.log
 
-# Fly.io
-.fly/
 pytest_output.txt

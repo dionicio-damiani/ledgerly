@@ -16,7 +16,6 @@ htmlcov/
 .pre-commit-config.yaml
 docker-compose.yml
 Dockerfile
-fly.toml
 Makefile
 README.md
 CONTRIBUTING.md

@@ -97,7 +97,6 @@ ledgerly/
 ├── entrypoint.sh                             # runs `alembic upgrade head`, then starts uvicorn
 ├── Dockerfile                                # multi-stage build, non-root runtime user
 ├── docker-compose.yml                         # local container run
-├── fly.toml                                    # Fly.io deployment config
 ├── alembic.ini                                  # Alembic configuration
 ├── .env.example                                  # template for local environment variables
 ├── requirements.txt

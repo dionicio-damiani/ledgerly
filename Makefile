@@ -43,8 +43,5 @@ docker:              ## Build the production Docker image
 docker-run:          ## Run the Docker image locally on :8000
 	docker compose up --build
 
-fly-deploy:          ## Deploy to Fly.io (requires `fly` CLI auth)
-	fly deploy
-
 clean:               ## Remove caches and build artifacts
 	rm -rf .pytest_cache .ruff_cache .coverage htmlcov coverage.xml dist build
