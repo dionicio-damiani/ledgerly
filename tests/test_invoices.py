@@ -178,9 +178,7 @@ async def test_update_invoice_recalculates_grand_total(async_client: AsyncClient
         **PAYLOAD,
         "items": [{"description": "Test", "quantity": "3", "unit_price": "100"}],
     }
-    update_response = await async_client.put(
-        f"/invoices/{invoice_id}", json=bigger_payload, headers=headers
-    )
+    update_response = await async_client.put(f"/invoices/{invoice_id}", json=bigger_payload, headers=headers)
     assert update_response.status_code == 200
 
     async with async_session_maker() as session:
