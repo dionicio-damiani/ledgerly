@@ -1,5 +1,11 @@
+from decimal import Decimal
+
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
+
+from app.db.database import async_session_maker
+from app.db.models import Invoice
 
 PAYLOAD = {
     "doc_type": "Invoice",
@@ -15,6 +21,13 @@ UPDATED_PAYLOAD = {
     **PAYLOAD,
     "doc_number": "TEST-UPDATE-001-EDITED",
     "client_name": "Updated Client",
+}
+
+TOTALS_PAYLOAD = {
+    **PAYLOAD,
+    "doc_number": "TEST-TOTALS-001",
+    "items": [{"description": "Test", "quantity": "2", "unit_price": "50"}],
+    "tax_rate": "10",
 }
 
 
@@ -131,3 +144,61 @@ async def test_update_invoice_unauthorized(async_client: AsyncClient):
         f"/invoices/{invoice_id}", json=UPDATED_PAYLOAD, headers=headers_intruder
     )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_generate_persists_grand_total(async_client: AsyncClient):
+    token = await _register_and_login(async_client, "persist-total@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    await async_client.post("/generate", json=TOTALS_PAYLOAD, headers=headers)
+
+    list_response = await async_client.get("/invoices", headers=headers)
+    invoice_id = list_response.json()[0]["id"]
+
+    async with async_session_maker() as session:
+        result = await session.execute(select(Invoice).where(Invoice.id == invoice_id))
+        invoice = result.scalar_one()
+
+    # subtotal 100.00, +10% tax = 110.00
+    assert invoice.grand_total == Decimal("110.00")
+
+
+@pytest.mark.asyncio
+async def test_update_invoice_recalculates_grand_total(async_client: AsyncClient):
+    token = await _register_and_login(async_client, "recalc-total@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    await async_client.post("/generate", json=PAYLOAD, headers=headers)
+
+    list_response = await async_client.get("/invoices", headers=headers)
+    invoice_id = list_response.json()[0]["id"]
+
+    bigger_payload = {
+        **PAYLOAD,
+        "items": [{"description": "Test", "quantity": "3", "unit_price": "100"}],
+    }
+    update_response = await async_client.put(
+        f"/invoices/{invoice_id}", json=bigger_payload, headers=headers
+    )
+    assert update_response.status_code == 200
+
+    async with async_session_maker() as session:
+        result = await session.execute(select(Invoice).where(Invoice.id == invoice_id))
+        invoice = result.scalar_one()
+
+    assert invoice.grand_total == Decimal("300.00")
+
+
+@pytest.mark.asyncio
+async def test_list_invoices_grand_total_from_column(async_client: AsyncClient):
+    token = await _register_and_login(async_client, "list-total-column@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    await async_client.post("/generate", json=TOTALS_PAYLOAD, headers=headers)
+
+    list_response = await async_client.get("/invoices", headers=headers)
+    assert list_response.status_code == 200
+    entry = list_response.json()[0]
+
+    assert entry["grand_total"] == "110.00"

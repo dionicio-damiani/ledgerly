@@ -190,11 +190,13 @@ async def generate(
 ) -> StreamingResponse:
     """Render the invoice/quote PDF and stream it back as `application/pdf`."""
     pdf_bytes = build_pdf(payload)
+    totals = compute_totals(payload)
 
     # Guardar en base de datos
     invoice = Invoice(
         user_id=user.id,
         invoice_data=payload.model_dump(mode="json"),
+        grand_total=totals.grand_total,
         pdf_bytes=pdf_bytes,
     )
     db.add(invoice)
@@ -240,7 +242,7 @@ async def list_invoices(
             "doc_type": inv.invoice_data.get("doc_type"),
             "client_name": inv.invoice_data.get("client_name"),
             "currency": inv.invoice_data.get("currency"),
-            "grand_total": str(compute_totals(InvoiceRequest(**inv.invoice_data)).grand_total),
+            "grand_total": str(inv.grand_total),
             "created_at": inv.created_at.isoformat(),
         }
         for inv in invoices
@@ -305,7 +307,9 @@ async def update_invoice(
     if not invoice:
         raise HTTPException(404, "Invoice not found")
 
+    totals = compute_totals(payload)
     invoice.invoice_data = payload.model_dump(mode="json")
+    invoice.grand_total = totals.grand_total
     invoice.pdf_bytes = build_pdf(payload)
     invoice.updated_at = datetime.utcnow()
     await db.commit()

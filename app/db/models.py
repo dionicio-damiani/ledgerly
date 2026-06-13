@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from decimal import Decimal
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, LargeBinary, String
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, LargeBinary, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
@@ -35,6 +36,11 @@ class Invoice(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     invoice_data: Mapped[dict] = mapped_column(JSON, nullable=False)
+    grand_total: Mapped[Decimal] = mapped_column(
+        Numeric(precision=12, scale=2),
+        nullable=False,
+        default=Decimal("0.00"),
+    )
     pdf_bytes: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
