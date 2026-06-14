@@ -1,6 +1,6 @@
 /* ================================================
    Ledgerly — invoices.js
-   "Mis facturas" page: list, view PDF, delete
+   "My invoices" page: list, view PDF, delete
 ================================================ */
 
 // Auth guard: si no hay token, redirigir a /login
@@ -43,7 +43,7 @@ async function downloadInvoicePdf(invoiceId, docNumber) {
   }
 
   if (!res.ok) {
-    showToast('No se pudo descargar el PDF.', 'error');
+    showToast("Couldn't download the PDF.", 'error');
     return;
   }
 
@@ -61,7 +61,7 @@ async function downloadInvoicePdf(invoiceId, docNumber) {
 }
 
 async function deleteInvoice(invoiceId, docNumber) {
-  if (!confirm(`¿Eliminar la factura ${docNumber}? Esta acción no se puede deshacer.`)) {
+  if (!confirm(`Delete invoice ${docNumber}? This action cannot be undone.`)) {
     return;
   }
 
@@ -76,11 +76,11 @@ async function deleteInvoice(invoiceId, docNumber) {
   }
 
   if (!res.ok) {
-    showToast('No se pudo eliminar la factura.', 'error');
+    showToast("Couldn't delete the invoice.", 'error');
     return;
   }
 
-  showToast('Factura eliminada.', 'success');
+  showToast('Invoice deleted.', 'success');
   loadInvoices();
 }
 
@@ -113,18 +113,18 @@ function renderInvoices(invoices) {
     const viewBtn = document.createElement('button');
     viewBtn.type = 'button';
     viewBtn.className = 'btn-row-action';
-    viewBtn.textContent = 'Ver';
+    viewBtn.textContent = 'View';
     viewBtn.addEventListener('click', () => downloadInvoicePdf(inv.id, inv.doc_number));
 
     const editBtn = document.createElement('a');
     editBtn.href = `/app?id=${inv.id}`;
     editBtn.className = 'btn-row-action';
-    editBtn.textContent = 'Editar';
+    editBtn.textContent = 'Edit';
 
     const deleteBtn = document.createElement('button');
     deleteBtn.type = 'button';
     deleteBtn.className = 'btn-row-action btn-row-danger';
-    deleteBtn.textContent = 'Eliminar';
+    deleteBtn.textContent = 'Delete';
     deleteBtn.addEventListener('click', () => deleteInvoice(inv.id, inv.doc_number));
 
     actionsCell.append(viewBtn, editBtn, deleteBtn);

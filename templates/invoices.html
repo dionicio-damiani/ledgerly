@@ -3,19 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ledgerly — Mis facturas</title>
+  <title>Ledgerly — My invoices</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar-brand">
-    <div class="brand-mark">L</div>
-    <div class="brand-text">
-      <span class="brand-name">Ledgerly</span>
-      <span class="brand-sub">Invoices &amp; quotes · PDF in seconds</span>
-    </div>
-  </div>
+  <a class="brand-wordmark" href="/">Ledgerly</a>
   <div class="topbar-actions">
     <button type="button" id="logout-btn" class="btn-logout">Log out</button>
   </div>
@@ -24,30 +18,30 @@
 <div class="app-shell">
   <main class="invoices-page">
     <div class="invoices-header">
-      <h1 class="invoices-title">Mis facturas</h1>
-      <a href="/app" class="btn-new-invoice">Nueva factura</a>
+      <h1 class="invoices-title">My invoices</h1>
+      <a href="/app" class="btn-new-invoice">New invoice</a>
     </div>
 
-    <p id="invoices-loading" class="invoices-state">Cargando...</p>
+    <p id="invoices-loading" class="invoices-state">Loading...</p>
 
     <div id="invoices-error" class="invoices-state" style="display:none;">
-      <p>No pudimos cargar tus facturas.</p>
-      <button type="button" id="invoices-retry" class="btn-new-invoice">Reintentar</button>
+      <p>We couldn't load your invoices.</p>
+      <button type="button" id="invoices-retry" class="btn-new-invoice">Retry</button>
     </div>
 
     <div id="invoices-empty" class="invoices-state" style="display:none;">
-      <p>Todavía no creaste ninguna factura.</p>
-      <a href="/app" class="btn-new-invoice">Crear la primera</a>
+      <p>You haven't created any invoices yet.</p>
+      <a href="/app" class="btn-new-invoice">Create your first invoice</a>
     </div>
 
     <table id="invoices-table" class="invoices-table" style="display:none;">
       <thead>
         <tr>
-          <th>Número</th>
-          <th>Cliente</th>
-          <th>Fecha</th>
+          <th>Number</th>
+          <th>Client</th>
+          <th>Date</th>
           <th>Total</th>
-          <th>Acciones</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="invoices-tbody"></tbody>
