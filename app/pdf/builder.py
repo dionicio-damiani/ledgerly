@@ -32,7 +32,7 @@ from app.pdf.theme import (
     get_theme,
     style,
 )
-from app.services.totals import compute_totals
+from app.services.totals import TotalsBreakdown
 
 if TYPE_CHECKING:
     from app.models import InvoiceRequest, LineItem
@@ -311,7 +311,7 @@ def _build_footer(req: InvoiceRequest, theme: Theme) -> list:
     ]
 
 
-def build_pdf(request: InvoiceRequest) -> bytes:
+def build_pdf(request: InvoiceRequest, totals: TotalsBreakdown) -> bytes:
     """Render the invoice/quote as a PDF and return its bytes.
 
     Raises:
@@ -319,7 +319,6 @@ def build_pdf(request: InvoiceRequest) -> bytes:
     """
     try:
         symbol = CURRENCIES[request.currency]
-        totals = compute_totals(request)
         theme = get_theme(request)
 
         buffer = io.BytesIO()

@@ -189,8 +189,8 @@ async def generate(
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     """Render the invoice/quote PDF and stream it back as `application/pdf`."""
-    pdf_bytes = build_pdf(payload)
     totals = compute_totals(payload)
+    pdf_bytes = build_pdf(payload, totals)
 
     # Guardar en base de datos
     invoice = Invoice(
@@ -310,7 +310,7 @@ async def update_invoice(
     totals = compute_totals(payload)
     invoice.invoice_data = payload.model_dump(mode="json")
     invoice.grand_total = totals.grand_total
-    invoice.pdf_bytes = build_pdf(payload)
+    invoice.pdf_bytes = build_pdf(payload, totals)
     invoice.updated_at = datetime.utcnow()
     await db.commit()
 

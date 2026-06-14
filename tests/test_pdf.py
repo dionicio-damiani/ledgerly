@@ -7,12 +7,14 @@ from pathlib import Path
 
 from app.models import ThemeColors
 from app.pdf.builder import build_pdf
+from app.services.totals import compute_totals
 
 EXAMPLE_PAYLOAD_PATH = Path(__file__).resolve().parent.parent / "examples" / "payload.json"
 
 
 def test_build_pdf_returns_pdf_bytes(sample_request):
-    data = build_pdf(sample_request)
+    totals = compute_totals(sample_request)
+    data = build_pdf(sample_request, totals)
     assert isinstance(data, bytes)
     assert data.startswith(b"%PDF-")
     assert len(data) > 1000
@@ -21,13 +23,15 @@ def test_build_pdf_returns_pdf_bytes(sample_request):
 def test_build_pdf_quote_without_due_date(sample_request):
     sample_request.doc_type = "Quote"
     sample_request.due_date = None
-    data = build_pdf(sample_request)
+    totals = compute_totals(sample_request)
+    data = build_pdf(sample_request, totals)
     assert data.startswith(b"%PDF-")
 
 
 def test_build_pdf_with_notes(sample_request):
     sample_request.notes = "Thank you for your business. Net 30."
-    data = build_pdf(sample_request)
+    totals = compute_totals(sample_request)
+    data = build_pdf(sample_request, totals)
     assert data.startswith(b"%PDF-")
 
 
@@ -36,7 +40,8 @@ def test_build_pdf_no_tax_no_discount(sample_request):
 
     sample_request.tax_rate = Decimal("0")
     sample_request.discount_percent = Decimal("0")
-    data = build_pdf(sample_request)
+    totals = compute_totals(sample_request)
+    data = build_pdf(sample_request, totals)
     assert data.startswith(b"%PDF-")
 
 
@@ -46,7 +51,8 @@ def test_generate_pdf_with_custom_colors(sample_request):
         secondary_color="#FFF5E1",
         text_color="#222222",
     )
-    data = build_pdf(sample_request)
+    totals = compute_totals(sample_request)
+    data = build_pdf(sample_request, totals)
     assert data.startswith(b"%PDF-")
     assert len(data) > 1000
 
