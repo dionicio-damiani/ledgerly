@@ -15,7 +15,7 @@ def test_landing_page_renders(client):
     res = client.get("/")
     assert res.status_code == 200
     assert "Ledgerly" in res.text
-    assert "Generate Invoice" in res.text
+    assert "Get started" in res.text
 
 
 def test_app_renders_template(client):
