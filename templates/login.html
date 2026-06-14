@@ -5,17 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ledgerly — Log in</title>
   <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 0%, rgba(91, 106, 240, 0.14) 0%, transparent 60%),
+        var(--bg);
+    }
+
+    .topbar {
+      background: transparent;
+      border-bottom-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .auth-card {
+      border-top: 3px solid var(--accent);
+      padding: 40px 36px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+    }
+
+    .auth-card .card-title {
+      font-family: 'Sora', var(--font);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      color: var(--text);
+    }
+
+    .auth-card .card-title::before {
+      display: none;
+    }
+
+    .auth-subtitle {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      max-width: 34ch;
+    }
+
+    .auth-form {
+      gap: 20px;
+      margin-top: 28px;
+    }
+
+    .auth-form input:focus {
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+    }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 28px 22px; }
+      .auth-card .card-title { font-size: 1.35rem; }
+    }
+  </style>
 </head>
 <body>
 
 <header class="topbar">
-  <a class="topbar-brand" href="/">
-    <div class="brand-mark">L</div>
-    <div class="brand-text">
-      <span class="brand-name">Ledgerly</span>
-      <span class="brand-sub">Invoices &amp; quotes · PDF in seconds</span>
-    </div>
-  </a>
+  <a class="brand-wordmark" href="/">Ledgerly</a>
 </header>
 
 <main class="auth-shell">
@@ -23,6 +73,7 @@
     <div class="card-header">
       <h2 class="card-title">Log in</h2>
     </div>
+    <p class="auth-subtitle">Welcome back. Enter your details to access your account.</p>
 
     <div id="auth-error" class="auth-error" style="display:none;"></div>
 
