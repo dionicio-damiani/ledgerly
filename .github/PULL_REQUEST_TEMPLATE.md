@@ -16,7 +16,6 @@ Briefly describe what this PR does and why.
 ## Checklist
 
 - [ ] Followed Conventional Commits style in commits
-- [ ] Updated `CHANGELOG.md` if user-facing
 - [ ] Updated docs/README if relevant
 
 ## Screenshots / examples

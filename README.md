@@ -1,6 +1,6 @@
 # Ledgerly
 
-[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions) ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white) ![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?logo=pydantic&logoColor=white) ![ReportLab](https://img.shields.io/badge/ReportLab-PDF-CC0000) ![pytest](https://img.shields.io/badge/pytest-tested-0A9EDC?logo=pytest&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white) ![Railway](https://img.shields.io/badge/Railway-deployed-0B0D0E?logo=railway&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black) ![Coverage](https://img.shields.io/badge/coverage-88%25-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue)
+[![CI](https://github.com/dionicio-damiani/ledgerly/actions/workflows/ci.yml/badge.svg)](https://github.com/dionicio-damiani/ledgerly/actions) ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white) ![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?logo=pydantic&logoColor=white) ![ReportLab](https://img.shields.io/badge/ReportLab-PDF-CC0000) ![pytest](https://img.shields.io/badge/pytest-tested-0A9EDC?logo=pytest&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white) ![Railway](https://img.shields.io/badge/Railway-deployed-0B0D0E?logo=railway&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black) ![Coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)
 
 ## Overview
 
@@ -291,4 +291,7 @@ The suite covers HTTP routes, Pydantic validation rules, Decimal arithmetic (inc
 
 ## License
 
-MIT — free to use, modify, and adapt for your own projects.
+Copyright (c) 2026 Dionicio Damiani. All Rights Reserved.
+
+This code is available for viewing purposes only. Unauthorized use,
+copying, modification, or distribution is prohibited.
