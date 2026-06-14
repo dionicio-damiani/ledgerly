@@ -6,6 +6,9 @@
   <meta name="description" content="Generate professional invoices and quotes as PDFs in seconds. No accounts, no subscriptions." />
   <title>Ledgerly — Professional Invoice Generator</title>
   <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
     @keyframes fadeUp {
       from {
@@ -18,13 +21,23 @@
       }
     }
 
+    /* ── Headline font ───────────────────────── */
+    .hero-title,
+    .section-title,
+    .step-number,
+    .step h3,
+    .feature-card h3,
+    .mockup-doctype-label {
+      font-family: 'Sora', var(--font);
+    }
+
     /* ── Landing nav ─────────────────────────── */
     .nav-cta {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 0.5rem 1.25rem;
-      background: #5b6af0;
+      background: var(--accent);
       border: none;
       border-radius: 8px;
       color: #ffffff;
@@ -41,6 +54,33 @@
       background: var(--accent-hover);
     }
 
+    /* ── Header: transparent over hero, solid on scroll ── */
+    .landing-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      margin-bottom: 0;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+      z-index: 200;
+    }
+
+    .landing-header.scrolled {
+      background-color: rgba(13, 13, 13, 0.85);
+      border-bottom-color: #222222;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    .landing-header .topbar-actions {
+      gap: 28px;
+    }
+
     /* ── Hero ────────────────────────────────── */
     .hero {
       position: relative;
@@ -49,6 +89,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      min-height: 90vh;
       padding: 7rem 2rem;
       overflow: hidden;
       background:
@@ -64,34 +105,51 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 720px;
+      max-width: 760px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .hero-content .brand-mark {
-      margin-bottom: 2rem;
-    }
-
-    .hero h1 {
-      font-size: 3.5rem;
-      font-weight: 700;
-      line-height: 1.15;
+    .hero-title {
+      font-size: clamp(2.75rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
       letter-spacing: -0.02em;
       color: var(--text);
       margin-bottom: 1.5rem;
-      animation: fadeUp 0.6s ease forwards;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards;
     }
 
     .hero-sub {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       color: var(--text-mid);
       line-height: 1.6;
       margin-bottom: 2.75rem;
-      max-width: 480px;
-      animation: fadeUp 0.6s ease 0.15s forwards;
+      max-width: 520px;
       opacity: 0;
+      animation: fadeUp 0.7s ease 0.18s forwards;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.36s forwards;
+    }
+
+    .hero-link {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .hero-link:hover {
+      color: var(--accent);
     }
 
     /* ── CTA buttons ─────────────────────────── */
@@ -117,16 +175,73 @@
       box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.35);
     }
 
-    .hero-content .btn-cta-primary {
-      animation: fadeUp 0.6s ease 0.3s forwards;
+    .btn-cta-large {
+      padding: 18px 38px;
+      font-size: 1.05rem;
+    }
+
+    /* ── Scroll reveal ───────────────────────── */
+    .reveal {
       opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-32px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(32px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── Section helpers ─────────────────────── */
+    .section-light {
+      background: #f7f7fb;
+      color: #1a1a2e;
+    }
+
+    .section-dark {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-title-left {
+      text-align: left;
+      margin-bottom: 1.25rem;
     }
 
     /* ── Features ────────────────────────────── */
     .features {
-      background: var(--bg-elevated);
-      border-bottom: 1px solid #222222;
-      padding: 5.5rem 2rem;
+      padding: 6rem 2rem;
     }
 
     .features-inner {
@@ -134,115 +249,350 @@
       margin: 0 auto;
     }
 
-    .features-title {
-      text-align: center;
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-bottom: 3.5rem;
-    }
-
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
     }
 
     .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 28px;
-      transition: border-color 0.15s ease;
+      background: #ffffff;
+      border: 1px solid #e7e7f2;
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(20, 20, 50, 0.04);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
     .feature-card:hover {
-      border-color: var(--accent);
+      border-color: rgba(var(--accent-rgb), 0.35);
+      box-shadow: 0 8px 24px rgba(20, 20, 50, 0.08);
     }
 
     .feature-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      background: rgba(var(--accent-rgb), 0.12);
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(var(--accent-rgb), 0.1);
       color: var(--accent);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .feature-icon svg {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
     }
 
     .feature-card h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: 1.15rem;
+      font-weight: 700;
       letter-spacing: -0.005em;
-      color: var(--text);
       margin-bottom: 10px;
     }
 
     .feature-card p {
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      color: #6b6b80;
+      line-height: 1.65;
+    }
+
+    /* ── How it works ────────────────────────── */
+    .how-it-works {
+      padding: 0;
+    }
+
+    .how-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      padding: 6.5rem 2rem;
+    }
+
+    .how-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2.25rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1;
+      min-width: 60px;
+      flex-shrink: 0;
+      color: rgba(var(--accent-rgb), 0.4);
+    }
+
+    .step h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .step p {
+      font-size: 0.92rem;
       color: var(--text-mid);
-      line-height: 1.6;
+      line-height: 1.65;
+      max-width: 400px;
+    }
+
+    /* ── PDF mockup ──────────────────────────── */
+    .pdf-mockup {
+      background: #ffffff;
+      color: #1a1a2e;
+      border-radius: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .mockup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 24px 24px 18px;
+    }
+
+    .mockup-doctype-label {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #0f4c81;
+    }
+
+    .mockup-doctype-number {
+      display: block;
+      font-size: 0.7rem;
+      color: #8a8aaa;
+      margin-top: 4px;
+    }
+
+    .mockup-sender {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .mockup-line {
+      display: block;
+      height: 6px;
+      width: 90px;
+      border-radius: 3px;
+      background: #e7e7f2;
+    }
+
+    .mockup-line-strong {
+      width: 110px;
+      background: #c7cce0;
+    }
+
+    .mockup-billing {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin: 0 24px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      background: #ebf2fa;
+    }
+
+    .mockup-bill-to,
+    .mockup-dates {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mockup-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #8a8aaa;
+    }
+
+    .mockup-table {
+      margin: 20px 24px 0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .mockup-table-header,
+    .mockup-table-row {
+      display: grid;
+      grid-template-columns: 2fr 0.6fr 1fr 1fr;
+      gap: 6px;
+      padding: 8px 10px;
+    }
+
+    .mockup-table-header {
+      background: #0f4c81;
+      color: #ffffff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .mockup-table-row {
+      font-size: 0.72rem;
+      border-bottom: 1px solid #eeeef5;
+    }
+
+    .mockup-table-row span:not(:first-child) {
+      text-align: right;
+      color: #4a4a6a;
+    }
+
+    .mockup-totals {
+      margin: 16px 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mockup-totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: #4a4a6a;
+    }
+
+    .mockup-grand {
+      margin: 16px 24px 24px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      background: #0f4c81;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .mockup-grand-amount {
+      font-size: 1.2rem;
+    }
+
+    /* ── Image + text profile section ────────── */
+    .profile-section {
+      padding: 0;
+    }
+
+    .profile-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      padding: 6.5rem 2rem;
+    }
+
+    .profile-image img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .profile-text p {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: #6b6b80;
+      margin-bottom: 1.75rem;
+    }
+
+    .profile-cta {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .profile-cta:hover {
+      color: var(--accent-hover);
     }
 
     /* ── Final CTA ───────────────────────────── */
     .cta-final {
-      background: var(--bg);
-      padding: 6.5rem 2rem;
+      padding: 7rem 2rem;
       text-align: center;
     }
 
-    .cta-final h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-bottom: 2rem;
+    .cta-final-inner {
+      max-width: 640px;
+      margin: 0 auto;
     }
 
-    .cta-hint {
-      margin-top: 1.25rem;
-      font-size: 0.8rem;
-      color: var(--text-dim);
+    .cta-final-sub {
+      font-size: 1.05rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
     }
 
     /* ── Footer ──────────────────────────────── */
     .landing-footer {
       background: var(--bg-elevated);
       border-top: 1px solid #222222;
-      padding: 1.75rem 2rem;
-      text-align: center;
+      padding: 2rem;
+    }
+
+    .landing-footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .landing-footer .brand-wordmark {
+      font-size: 1rem;
+    }
+
+    .footer-year {
       font-size: 0.8rem;
       color: var(--text-dim);
     }
 
     /* ── Responsive ──────────────────────────── */
     @media (max-width: 768px) {
-      .hero { padding: 4.5rem 1.5rem; }
-      .hero h1 { font-size: 2.25rem; }
-      .features { padding: 3.5rem 1.5rem; }
-      .features-title { font-size: 1.4rem; }
+      .hero { padding: 6rem 1.5rem; min-height: 80vh; }
+      .features { padding: 4rem 1.5rem; }
       .features-grid { grid-template-columns: 1fr; }
+      .how-inner,
+      .profile-inner { grid-template-columns: 1fr; gap: 40px; padding: 4rem 1.5rem; }
       .cta-final { padding: 4.5rem 1.5rem; }
-      .cta-final h2 { font-size: 1.5rem; }
+      .step p { max-width: none; }
     }
 
     @media (max-width: 480px) {
-      .features-title { font-size: 1.15rem; }
+      .landing-header { padding: 16px 1.25rem; }
+      .landing-header .topbar-actions { gap: 16px; }
+      .hero-ctas { flex-direction: column; gap: 1rem; }
     }
   </style>
 </head>
 <body>
 
   <!-- ── Nav ──────────────────────────────────── -->
-  <header class="topbar">
+  <header class="topbar landing-header">
     <a class="brand-wordmark" href="/">Ledgerly</a>
     <nav class="topbar-actions">
       <a class="nav-link" href="/login">Log in</a>
@@ -255,30 +605,61 @@
     <!-- ── Hero ─────────────────────────────── -->
     <section class="hero">
       <div class="hero-content">
-        <h1>Professional invoices.<br />Generated in seconds.</h1>
-        <p class="hero-sub">Fill a form, get a PDF. No accounts, no subscriptions.</p>
-        <a class="btn-cta-primary" href="/app">Generate Invoice →</a>
+        <h1 class="hero-title">Professional invoices &amp; quotes.<br />PDF in seconds.</h1>
+        <p class="hero-sub">Create, customize, and download professional documents.<br />Your invoice history, always saved.</p>
+        <div class="hero-ctas">
+          <a class="btn-cta-primary" href="/register">Get started</a>
+          <a class="hero-link" href="/login">Log in →</a>
+        </div>
       </div>
     </section>
 
     <!-- ── Features ─────────────────────────── -->
-    <section class="features">
+    <section class="features section-light">
       <div class="features-inner">
-        <h2 class="features-title">Billing precision, zero friction.</h2>
+        <h2 class="section-title">Billing with the precision your work deserves</h2>
         <div class="features-grid">
 
-          <div class="feature-card">
+          <div class="feature-card reveal" data-delay="0">
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 11l3 3L22 4" />
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="8" y1="13" x2="16" y2="13" />
+                <line x1="8" y1="17" x2="16" y2="17" />
+                <line x1="8" y1="9" x2="10" y2="9" />
               </svg>
             </div>
-            <h3>Exact Decimal Precision</h3>
-            <p>Arithmetic handled with Python's Decimal — no float drift, no rounding errors.</p>
+            <h3>Invoice &amp; Quote builder</h3>
+            <p>Generate professional invoices and quotes from a single form. Switch between document types instantly.</p>
           </div>
 
-          <div class="feature-card">
+          <div class="feature-card reveal" data-delay="100">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v5h5" />
+                <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8" />
+                <path d="M12 7v5l4 2" />
+              </svg>
+            </div>
+            <h3>Invoice history &amp; editing</h3>
+            <p>Every document you create is saved to your account. Edit, revisit, and re-download any invoice at any time.</p>
+          </div>
+
+          <div class="feature-card reveal" data-delay="200">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a10 10 0 1 0 0 20 1.5 1.5 0 0 0 1.06-2.56 1.5 1.5 0 0 1 1.06-2.56H17a4 4 0 0 0 4-4 8 8 0 0 0-9-8z" />
+                <circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+                <circle cx="11.5" cy="7.5" r="1" fill="currentColor" stroke="none" />
+                <circle cx="15.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+            </div>
+            <h3>Custom PDF theming</h3>
+            <p>Choose your primary, secondary, and text colors. Your brand, reflected in every PDF you send.</p>
+          </div>
+
+          <div class="feature-card reveal" data-delay="300">
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10" />
@@ -286,35 +667,175 @@
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
               </svg>
             </div>
-            <h3>Multi-currency &amp; Tax</h3>
-            <p>USD, EUR, MXN and more. Tax and discount applied in the right order, every time.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="12" y1="11" x2="12" y2="17" />
-                <polyline points="9 14 12 17 15 14" />
-              </svg>
-            </div>
-            <h3>Instant PDF Download</h3>
-            <p>Server-side PDF generation via ReportLab. Your file, your data, no storage.</p>
+            <h3>Multi-currency &amp; tax precision</h3>
+            <p>USD, EUR, MXN and more. Tax and discount calculated with exact decimal precision — no float errors, ever.</p>
           </div>
 
         </div>
       </div>
     </section>
 
+    <!-- ── How it works ─────────────────────── -->
+    <section class="how-it-works section-dark">
+      <div class="how-inner">
+        <div class="how-steps">
+          <h2 class="section-title section-title-left">From zero to professional invoice in minutes</h2>
+
+          <div class="step reveal" data-delay="0">
+            <span class="step-number">01</span>
+            <div>
+              <h3>Fill your details</h3>
+              <p>Enter your business info, client data, line items, taxes and currency. Everything in one form.</p>
+            </div>
+          </div>
+
+          <div class="step reveal" data-delay="150">
+            <span class="step-number">02</span>
+            <div>
+              <h3>Customize your theme</h3>
+              <p>Pick your brand colors for the PDF header, totals banner, and row accents. Preview updates instantly.</p>
+            </div>
+          </div>
+
+          <div class="step reveal" data-delay="300">
+            <span class="step-number">03</span>
+            <div>
+              <h3>Download your PDF</h3>
+              <p>Hit generate. Your professionally formatted PDF is ready to download in seconds, server-side rendered.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-mockup reveal" data-delay="0">
+          <div class="pdf-mockup">
+            <div class="mockup-header">
+              <div>
+                <span class="mockup-doctype-label">INVOICE</span>
+                <span class="mockup-doctype-number"># 2026-014</span>
+              </div>
+              <div class="mockup-sender">
+                <span class="mockup-line mockup-line-strong"></span>
+                <span class="mockup-line"></span>
+                <span class="mockup-line"></span>
+              </div>
+            </div>
+
+            <div class="mockup-billing">
+              <div class="mockup-bill-to">
+                <span class="mockup-label">BILL TO</span>
+                <span class="mockup-line mockup-line-strong"></span>
+                <span class="mockup-line"></span>
+              </div>
+              <div class="mockup-dates">
+                <span class="mockup-label">ISSUE DATE</span>
+                <span class="mockup-line"></span>
+              </div>
+            </div>
+
+            <div class="mockup-table">
+              <div class="mockup-table-header">
+                <span>Description</span>
+                <span>Qty</span>
+                <span>Price</span>
+                <span>Total</span>
+              </div>
+              <div class="mockup-table-row">
+                <span>Web design</span>
+                <span>2</span>
+                <span>$500.00</span>
+                <span>$1,000.00</span>
+              </div>
+              <div class="mockup-table-row">
+                <span>Hosting (12 mo)</span>
+                <span>12</span>
+                <span>$9.99</span>
+                <span>$119.88</span>
+              </div>
+              <div class="mockup-table-row">
+                <span>Consulting</span>
+                <span>4</span>
+                <span>$100.00</span>
+                <span>$400.00</span>
+              </div>
+            </div>
+
+            <div class="mockup-totals">
+              <div class="mockup-totals-row"><span>Subtotal</span><span>$1,519.88</span></div>
+              <div class="mockup-totals-row"><span>Tax (16%)</span><span>$243.18</span></div>
+            </div>
+
+            <div class="mockup-grand">
+              <span>TOTAL DUE</span>
+              <span class="mockup-grand-amount">$1,763.06</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Built for freelancers ────────────── -->
+    <section class="profile-section section-light">
+      <div class="profile-inner">
+        <div class="profile-image reveal-left">
+          <img
+            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"
+            alt="Person typing on a laptop at a clean, well-lit desk"
+            loading="lazy"
+          />
+        </div>
+        <div class="profile-text reveal-right">
+          <h2 class="section-title section-title-left">Built for freelancers, consultants, and small businesses</h2>
+          <p>Whether you bill monthly retainers, project milestones, or one-time services — Ledgerly gives you the tools to invoice with confidence. Clean documents, exact numbers, your brand.</p>
+          <a class="profile-cta" href="/register">Create your first invoice →</a>
+        </div>
+      </div>
+    </section>
+
     <!-- ── Final CTA ────────────────────────── -->
-    <section class="cta-final">
-      <h2>Ready to send your first invoice?</h2>
-      <a class="btn-cta-primary" href="/app">Get Started →</a>
-      <p class="cta-hint">Free. No sign-up required.</p>
+    <section class="cta-final section-dark">
+      <div class="cta-final-inner reveal" data-delay="0">
+        <h2 class="section-title">Designed for how professionals bill</h2>
+        <p class="cta-final-sub">Join Ledgerly and start sending invoices that reflect the quality of your work.</p>
+        <a class="btn-cta-primary btn-cta-large" href="/register">Get started</a>
+      </div>
     </section>
 
   </main>
+
+  <!-- ── Footer ───────────────────────────────── -->
+  <footer class="landing-footer">
+    <div class="landing-footer-inner">
+      <span class="brand-wordmark">Ledgerly</span>
+      <span class="footer-year">© 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.querySelector('.landing-header');
+      function onScroll() {
+        header.classList.toggle('scrolled', window.scrollY > 60);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      var revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+      var observer = new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          var delay = el.getAttribute('data-delay');
+          if (delay) el.style.transitionDelay = delay + 'ms';
+          el.classList.add('visible');
+          obs.unobserve(el);
+        });
+      }, { threshold: 0.15 });
+
+      revealEls.forEach(function (el) {
+        observer.observe(el);
+      });
+    })();
+  </script>
 
 </body>
 </html>
