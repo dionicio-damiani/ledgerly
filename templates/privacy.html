@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ledgerly Privacy Policy — how we collect, use and protect your data." />
+  <title>Ledgerly — Privacy Policy</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Landing nav ─────────────────────────── */
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.5rem 1.25rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ── Header: transparent over hero, solid on scroll ── */
+    .landing-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      margin-bottom: 0;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+      z-index: 200;
+    }
+
+    .landing-header.scrolled {
+      background-color: rgba(13, 13, 13, 0.85);
+      border-bottom-color: #222222;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    .landing-header .topbar-actions {
+      gap: 28px;
+    }
+
+    /* ── Scroll reveal ───────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Section helpers ─────────────────────── */
+    .section-light {
+      background: #eef1f7;
+      color: #1a1a2e;
+    }
+
+    .section-dark {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── Curve seam transitions ──────────────── */
+    .curve-seam {
+      width: 100%;
+      line-height: 0;
+    }
+
+    .curve-seam svg {
+      display: block;
+      width: 100%;
+      height: clamp(32px, 6vw, 64px);
+    }
+
+    .curve-seam-to-light {
+      background: #0d0d0d;
+    }
+
+    .curve-seam-to-light svg path {
+      fill: #eef1f7;
+    }
+
+    .curve-seam-to-dark {
+      background: #eef1f7;
+    }
+
+    .curve-seam-to-dark svg path {
+      fill: #0d0d0d;
+    }
+
+    /* ── Legal hero ───────────────────────────── */
+    .legal-hero {
+      padding: 9rem 2rem 4rem;
+    }
+
+    .legal-hero-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .legal-title {
+      font-family: 'Sora', var(--font);
+      font-size: clamp(2.25rem, 5vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      position: relative;
+      padding-bottom: 1.25rem;
+    }
+
+    .legal-title::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 48px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+
+    .legal-updated {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+    }
+
+    /* ── Legal content ────────────────────────── */
+    .legal-content {
+      padding: 5rem 2rem 6rem;
+    }
+
+    .legal-content-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .legal-block h2 {
+      font-family: 'Sora', var(--font);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1a1a2e;
+    }
+
+    .legal-block p {
+      font-size: 0.98rem;
+      line-height: 1.75;
+      color: #5a5a6e;
+      max-width: 64ch;
+    }
+
+    .legal-block p + p {
+      margin-top: 0.9rem;
+    }
+
+    .legal-block ul {
+      margin-top: 0.9rem;
+      padding-left: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .legal-block li {
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: #5a5a6e;
+      max-width: 64ch;
+    }
+
+    /* ── Footer ──────────────────────────────── */
+    .landing-footer {
+      background: var(--bg-elevated);
+      border-top: 1px solid #222222;
+      padding: 2.5rem 2rem;
+    }
+
+    .landing-footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .footer-accent-bar {
+      display: block;
+      width: 3px;
+      height: 32px;
+      flex-shrink: 0;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--accent), rgba(var(--accent-rgb), 0.15));
+    }
+
+    .footer-brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .landing-footer .brand-wordmark {
+      font-size: 1rem;
+    }
+
+    .footer-year {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* ── Responsive ──────────────────────────── */
+    @media (max-width: 768px) {
+      .legal-hero { padding: 7rem 1.5rem 3rem; }
+      .legal-content { padding: 3.5rem 1.5rem 4rem; }
+    }
+
+    @media (max-width: 480px) {
+      .landing-header { padding: 16px 1.25rem; }
+      .landing-header .topbar-actions { gap: 16px; }
+      .landing-footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-links { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Nav ──────────────────────────────────── -->
+  <header class="topbar landing-header">
+    <a class="brand-wordmark" href="/">Ledgerly</a>
+    <nav class="topbar-actions">
+      <a class="nav-link" href="/login">Log in</a>
+      <a class="nav-cta" href="/register">Sign up</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ── Title ────────────────────────────── -->
+    <section class="legal-hero section-dark">
+      <div class="legal-hero-inner">
+        <h1 class="legal-title">Privacy Policy</h1>
+        <p class="legal-updated">Last updated: June 2026</p>
+      </div>
+    </section>
+
+    <div class="curve-seam curve-seam-to-light" aria-hidden="true">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,40 Q720,0 1440,40 L1440,60 L0,60 Z" />
+      </svg>
+    </div>
+
+    <!-- ── Content ──────────────────────────── -->
+    <section class="legal-content section-light">
+      <div class="legal-content-inner">
+
+        <div class="legal-block reveal" data-delay="0">
+          <h2>Information we collect</h2>
+          <p>To use Ledgerly, you create an account with an email address and a password. Your password is never stored in plain text — we store it as a securely hashed value that cannot be reversed.</p>
+          <p>When you build an invoice or quote, you provide the information needed to generate the document: your business details, your client's details, line items, quantities, prices, taxes, discounts, notes, and an optional logo, signature image, and PDF color theme.</p>
+        </div>
+
+        <div class="legal-block reveal" data-delay="40">
+          <h2>How we use your information</h2>
+          <ul>
+            <li>To create and secure your account, and to verify your identity when you log in.</li>
+            <li>To generate your invoices and quotes as PDF documents. This generation happens entirely on Ledgerly's servers — your data is never sent to a third-party service to produce the document.</li>
+            <li>To store the invoices and quotes you create, so you can view, edit, re-download, or delete them later from the "My invoices" page.</li>
+          </ul>
+        </div>
+
+        <div class="legal-block reveal" data-delay="80">
+          <h2>Where your data is stored</h2>
+          <p>Your account details and the invoices and quotes you create are stored in Ledgerly's database, tied to your account. Uploaded logos and signature images are stored so they can be rendered on your PDF documents.</p>
+          <p>Your session is kept active using an authentication token stored in your browser. This token is only used to identify you to Ledgerly's servers and is removed when you log out.</p>
+        </div>
+
+        <div class="legal-block reveal" data-delay="120">
+          <h2>How we share your information</h2>
+          <p>We do not sell, rent, or trade your personal information or the contents of your invoices and quotes to any third party. We do not use third-party advertising or analytics services that track you across the web.</p>
+          <p>Your data is only ever accessed by Ledgerly's own systems in order to provide the service to you.</p>
+        </div>
+
+        <div class="legal-block reveal" data-delay="160">
+          <h2>Data retention and deletion</h2>
+          <p>Invoices and quotes remain stored in your account for as long as you keep them. Deleting an invoice from "My invoices" permanently removes it from our database.</p>
+          <p>If you'd like your account and all associated data removed entirely, you can request this and we will delete it from our systems.</p>
+        </div>
+
+        <div class="legal-block reveal" data-delay="200">
+          <h2>Changes to this policy</h2>
+          <p>If we make changes to how Ledgerly collects, uses, or stores data, we will update this page and revise the "Last updated" date above.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="curve-seam curve-seam-to-dark" aria-hidden="true">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,40 Q720,0 1440,40 L1440,60 L0,60 Z" />
+      </svg>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ───────────────────────────────── -->
+  <footer class="landing-footer">
+    <div class="landing-footer-inner">
+      <div class="footer-brand">
+        <span class="footer-accent-bar" aria-hidden="true"></span>
+        <div class="footer-brand-text">
+          <span class="brand-wordmark">Ledgerly</span>
+          <span class="footer-year">© 2026 Ledgerly. All rights reserved.</span>
+        </div>
+      </div>
+      <nav class="footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.querySelector('.landing-header');
+      function onScroll() {
+        header.classList.toggle('scrolled', window.scrollY > 60);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      var revealEls = document.querySelectorAll('.reveal');
+      var observer = new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          var delay = el.getAttribute('data-delay');
+          if (delay) el.style.transitionDelay = delay + 'ms';
+          el.classList.add('visible');
+          obs.unobserve(el);
+        });
+      }, { threshold: 0.15 });
+
+      revealEls.forEach(function (el) {
+        observer.observe(el);
+      });
+    })();
+  </script>
+</body>
+</html>

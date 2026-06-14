@@ -168,6 +168,16 @@ async def my_invoices_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "invoices.html")
 
 
+@app.get("/privacy", response_class=HTMLResponse, include_in_schema=False)
+async def privacy_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "privacy.html")
+
+
+@app.get("/terms", response_class=HTMLResponse, include_in_schema=False)
+async def terms_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "terms.html")
+
+
 @app.post(
     "/generate",
     tags=["documents"],
