@@ -749,7 +749,7 @@
     <a class="brand-wordmark" href="/">Ledgerly</a>
     <nav class="topbar-actions">
       <a class="nav-link" href="/login">Log in</a>
-      <a class="nav-cta" href="/register">Sign up</a>
+      <a class="nav-cta" id="nav-cta" href="/register">Sign up</a>
     </nav>
   </header>
 
@@ -761,7 +761,7 @@
         <h1 class="hero-title">Professional invoices &amp; quotes.<br />PDF in seconds.</h1>
         <p class="hero-sub">Create, customize, and download professional documents.<br />Your invoice history, always saved.</p>
         <div class="hero-ctas">
-          <a class="btn-cta-primary" href="/register">Get started</a>
+          <a class="btn-cta-primary cta-get-started" href="/register">Get started</a>
         </div>
       </div>
     </section>
@@ -1080,7 +1080,7 @@
       <div class="cta-final-inner reveal" data-delay="0">
         <h2 class="section-title">Designed for how professionals bill</h2>
         <p class="cta-final-sub">Join Ledgerly and start sending invoices that reflect the quality of your work.</p>
-        <a class="btn-cta-primary btn-cta-large" href="/register">Get started</a>
+        <a class="btn-cta-primary btn-cta-large cta-get-started" href="/register">Get started</a>
       </div>
     </section>
 
@@ -1103,8 +1103,29 @@
     </div>
   </footer>
 
+  <script src="/static/auth.js"></script>
   <script>
     (function () {
+      // ── Auth-aware header & CTAs ─────────────
+      var isAuthed = window.Auth && window.Auth.isAuthenticated();
+
+      if (isAuthed) {
+        var navCta = document.getElementById('nav-cta');
+        if (navCta) {
+          navCta.textContent = 'Go to app';
+          navCta.setAttribute('href', '/app');
+        }
+      }
+
+      document.querySelectorAll('.cta-get-started').forEach(function (el) {
+        el.addEventListener('click', function (event) {
+          if (window.Auth && window.Auth.isAuthenticated()) {
+            event.preventDefault();
+            window.location.href = '/app';
+          }
+        });
+      });
+
       var header = document.querySelector('.landing-header');
       function onScroll() {
         header.classList.toggle('scrolled', window.scrollY > 60);
