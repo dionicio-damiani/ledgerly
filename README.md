@@ -58,7 +58,7 @@ Ledgerly is structured to demonstrate the parts of a freelance engagement that a
 
 For a client evaluating a developer, that's the difference between "a script that produces a PDF" and "an application I could hand off and operate" — accounts, persistence, theming, a test suite that catches regressions, and a deployment that doesn't require manual steps.
 
-## Screenshots
+## Preview
 
 ![Landing and auth flow](assets/landing.gif)
 *Landing page scroll, sign up flow, and redirect to app.*
