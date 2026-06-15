@@ -60,14 +60,14 @@ For a client evaluating a developer, that's the difference between "a script tha
 
 ## Preview
 
-![Landing and auth flow](assets/landing.gif)
 *Landing page scroll, sign up flow, and redirect to app.*
+![Landing and auth flow](assets/landing.gif)
 
-![Invoice generation](assets/app.gif)
 *Full invoice form, custom PDF theming, and PDF download.*
+![Invoice generation](assets/app.gif)
 
-![Invoice history](assets/invoices.gif)
 *Invoice history, edit mode, and re-download.*
+![Invoice history](assets/invoices.gif)
 
 ## Tech stack
 
