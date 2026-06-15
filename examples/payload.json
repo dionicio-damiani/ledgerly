@@ -1,0 +1,22 @@
+{
+  "doc_type": "Invoice",
+  "doc_number": "2026-001",
+  "issue_date": "2026-01-15",
+  "due_date": "2026-02-14",
+  "currency": "USD",
+  "sender_name": "Acme Studio",
+  "sender_email": "hello@acme.example.com",
+  "sender_phone": "+1 555 010 0100",
+  "sender_address": "123 Main St\nNew York, NY 10001",
+  "client_name": "John Smith",
+  "client_email": "john@example.com",
+  "client_company": "Smith & Co.",
+  "client_address": "456 Oak Ave\nLos Angeles, CA 90001",
+  "items": [
+    {"description": "Web design (3 pages)", "quantity": "1", "unit_price": "1500.00"},
+    {"description": "Hosting (12 months)", "quantity": "12", "unit_price": "9.99"}
+  ],
+  "tax_rate": "16",
+  "discount_percent": "10",
+  "notes": "Net 30. Thank you for your business."
+}

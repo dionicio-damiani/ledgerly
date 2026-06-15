@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ledgerly — My invoices</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="alternate icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand-wordmark" href="/">Ledgerly</a>
+  <div class="topbar-actions">
+    <button type="button" id="logout-btn" class="btn-logout">Log out</button>
+  </div>
+</header>
+
+<div class="app-shell">
+  <main class="invoices-page">
+    <div class="invoices-header">
+      <h1 class="invoices-title">My invoices</h1>
+      <a href="/app" class="btn-new-invoice">New invoice</a>
+    </div>
+
+    <p id="invoices-loading" class="invoices-state">Loading...</p>
+
+    <div id="invoices-error" class="invoices-state" style="display:none;">
+      <p>We couldn't load your invoices.</p>
+      <button type="button" id="invoices-retry" class="btn-new-invoice">Retry</button>
+    </div>
+
+    <div id="invoices-empty" class="invoices-state" style="display:none;">
+      <p>You haven't created any invoices yet.</p>
+      <a href="/app" class="btn-new-invoice">Create your first invoice</a>
+    </div>
+
+    <table id="invoices-table" class="invoices-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Client</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="invoices-tbody"></tbody>
+    </table>
+  </main>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script src="/static/auth.js"></script>
+<script src="/static/invoices.js"></script>
+</body>
+</html>
